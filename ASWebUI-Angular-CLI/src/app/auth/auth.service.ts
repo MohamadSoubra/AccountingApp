@@ -49,18 +49,28 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(this.rootUrl + "/token", params, options)
       .pipe(
-        tap((token) => {
-          // console.log("token", token);
+        tap((response) => {
+          console.log("response", response);
+          if(response.errors !== null){
+            throw(response);
+          }
 
           //this.accessToken = JSON.parse(atob(token.token.split(".")[1]));
-          const decodedToken = this.decodeToken(token.accessToken);
-
-          this.refreshTokenString = token.refreshToken;
+          const decodedToken = this.decodeToken(response.accessToken);
+          console.log("decodedToken",decodedToken);
+          
+          this.refreshTokenString = response.refreshToken;
 
           const user = new User();
-          user.id = decodedToken.id;
-          user.email = decodedToken.email;
-          user.token = token.accessToken;
+          if(!decodedToken){
+            console.log(decodedToken);
+            return null;
+          }else{
+
+            user.id = decodedToken.id;
+            user.email = decodedToken.email;
+            user.token = response.accessToken;
+          }
 
           this.user.next(user);
 
@@ -72,27 +82,23 @@ export class AuthService {
 
           this.autoRefreshToken(
             this.getTokenDuration(+decodedToken.exp),
-            token.accessToken // + 7200000
+            response.accessToken // + 7200000
           );
-          localStorage.setItem("token", token.accessToken);
+          localStorage.setItem("token", response.accessToken);
           //localStorage.setItem("userData", JSON.stringify(user));
         }),
         catchError((errorRes) => {
-          console.log(errorRes);
+          console.log("errorRes",errorRes);
           let errorMessage = "An Error Occured";
           if (errorRes.status == 0) {
             errorMessage = "Could not connect to the server";
             return throwError(errorMessage);
-          } else if (
-            errorRes.status == 401 ||
-            errorRes.status == 404 ||
-            errorRes.status == 400
-          ) {
-            errorMessage = errorRes.error;
+          } else {
+            errorMessage = errorRes.errors;
           }
           //errorMessage = errorRes.error;
-          //console.log(errorMessage + " errorMessage from auth service");
-          //console.log(errorRes.error + " errorRes from auth service");
+          // console.log(errorMessage + " errorMessage from auth service");
+          // console.log(errorRes + " errorRes from auth service BRFORE THROW");
           return throwError(errorMessage);
         })
       );

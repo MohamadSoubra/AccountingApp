@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AccountingSoftwareApi.Data;
 using AccountingSoftwareApi.Identity;
@@ -12,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace AccountingSoftwareApi.Controllers
 {
@@ -34,23 +38,11 @@ namespace AccountingSoftwareApi.Controllers
         [HttpPost]
         public async Task<AuthenticationResult> Create(string email, string password, string grant_type)
         {
-            #region Old Code
-            /*
-            if (await IsValidUsernameAndPassword(email,password))
-            {
-                //return new ObjectResult(await GenerateTokens(email));
-                return await _identityService.LoginAsync(email, password);
-            }
-            else
-            {
-                return new AuthenticationResult {Errors = new[] { "Invalid email or password" } };
-            }
-            */
-            #endregion
+
 
             var authResponse = await _identityService.LoginAsync(email, password);
 
-            if (authResponse == null) 
+            if (authResponse.Errors != null) 
             {
 
                 return new AuthenticationResult { Errors = new[] { "Invalid email or password" } };
@@ -147,7 +139,11 @@ namespace AccountingSoftwareApi.Controllers
                 });
             }
 
-            setTokenCookie(authResponse.RefreshToken);
+            if (refreshToken != null)
+            {
+                setTokenCookie(authResponse.RefreshToken);
+            }
+
 
             return Ok(new AuthSuccessResponse
             {

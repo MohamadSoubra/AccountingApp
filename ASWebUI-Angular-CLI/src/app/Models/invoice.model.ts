@@ -12,13 +12,13 @@ export class Invoice implements Identification {
   // [client: string | number]: string | number | Client;
   client?: Client ;
   // clientId: number;
+  status: string;
   sale? : Sale;
   invoiceNumber: string;
   description: string;
   invoiceDate: string;
   paymentDueDate: string;
   amountDue: number;
-  status: string;
   saleDetails: SaleDetail[];
   // subTotal: number;
   // tax: number;
@@ -30,11 +30,11 @@ export class Invoice implements Identification {
     invoiceNumber = "",
     client = new Client(),
     // clientId = 0,
-    description = "",
-    invoiceDate = "",
-    paymentDueDate = "",
-    amountDue = 0,
     status = "Pending",
+    description = "",
+    invoiceDate = new Date().toString(),
+    paymentDueDate = new Date().toString(),
+    amountDue = 0,
     saleDetails = [],
     sale = new Sale()
   } = {}) {
@@ -42,11 +42,11 @@ export class Invoice implements Identification {
     this.invoiceNumber = invoiceNumber;
     // this.clientId = clientId;
     this.client = client;
+    this.status = status;
     this.description = description;
     this.invoiceDate = invoiceDate;
     this.paymentDueDate = paymentDueDate;
     this.amountDue = amountDue;
-    this.status = status;
     this.saleDetails = saleDetails;
     this.sale=sale;
   }

@@ -477,6 +477,14 @@ export class AddEditComponent<T> implements OnInit {
           Included = false;
         }
 
+        if (prop === "invoiceNumber") {
+          Included = false;
+        }
+
+        if (prop === "amountDue") {
+          Included = false;
+        }
+
 
 
         if (prop === "sale") {

@@ -175,6 +175,8 @@ export class DisplayModalComponent<T extends Identification> implements OnInit {
 
   resetAutoComplete(prop){
     this.formItemSaleDetail.get(prop.formControlName).setValue({});
+    this.formItemSaleDetail.get("price").setValue(0);
+
   }
 
   objectHasEmptyProperties(object){

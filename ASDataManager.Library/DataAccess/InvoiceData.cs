@@ -151,7 +151,6 @@ namespace ASDataManager.Library.DataAccess
             InvoiceDBModel invoiceDB = new InvoiceDBModel {
                 ClientId = invoice.Client.Id,
                 //SaleId = invoice.Sale.Id,
-                InvoiceNumber = invoice.InvoiceNumber,
                 Description = invoice.Description,
                 InvoiceDate = (DateTime)invoice.InvoiceDate,
                 PaymentDueDate = (DateTime)invoice.PaymentDueDate,
