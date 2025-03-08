@@ -30,6 +30,7 @@ import { AddEditModule } from "./sharedFeatures/add-edit/add-edit.module";
 import { AngularMaterialModule } from "./sharedFeatures/angular-material/angular-material.module";
 import { TableModule } from "./sharedFeatures/table/table.module";
 import { ProductsComponent } from "./components/products/products.component";
+import { InvoiceDisplayModule } from "./features/invoice/invoice-display/invoice-display.module";
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { ProductsComponent } from "./components/products/products.component";
     AlertModule.forRoot(),
     RouterModule,
     InvoiceModule,
+    InvoiceDisplayModule,
     AddEditModule,
     BrowserAnimationsModule,
     BrowserModule,

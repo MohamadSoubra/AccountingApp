@@ -3,11 +3,12 @@ import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { switchMap,map } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import { Client } from 'src/app/models/client.model';
-import { Invoice } from 'src/app/models/invoice.model';
+import { Invoice, InvoiceStatus, InvoiceStatus2LabelMapping } from 'src/app/models/invoice.model';
 import { SaleDetail } from 'src/app/models/sale-detail.model';
 import { Sale } from 'src/app/models/sale.model';
 import { ApiHelperService } from 'src/app/services/ApiHelper.service';
@@ -46,17 +47,20 @@ export class AddEditComponent<T> implements OnInit {
   itemform = this.fb.group({});
   labelstext = [];
   selectValue = false;
-  selectInputData: any;
+  SelectOptionsForClient: any;
+  SelectOptionsForStatus: any = Object.values(InvoiceStatus);
   selectInputValue: any;
   previousRoute: string;
   saledetailscolumns: TableColumn[];
-  saleDetailsData: TableDataSource<SaleDetail>;
+  saleDetailsData: SaleDetail[];
   hasSailDetails: boolean = false;
   isSaleDetails: boolean = false;
   isInvoice: boolean = false;
   disabled = true;
 
-  update : boolean = false;
+  invoiceStatusDisplay = InvoiceStatus2LabelMapping;
+
+  update: boolean = false;
 
   needTable: boolean = false;
   //temp variable
@@ -64,52 +68,16 @@ export class AddEditComponent<T> implements OnInit {
 
   currentItemId: number;
 
-  subTotal: number = 0;
-  tax: number = 0;
-  total: number = 0;
+  // subTotal: number = 0;
+  // tax: number = 0;
+  // total: number = 0;
   // autoCompleteValue: any;
 
-  IPO: Observable<T>;
+  IPO: Observable<T> = null;
 
 
 
   ngOnInit(): void {
-    console.log("this.total ON INIT", this.total);
-
-    
-    // console.log("this.apiHelper.objectbyId", this.apiHelper.objectbyId);
-    // this.saleDetailsData = [{
-    //   description: "Added From SSMS",
-    //   id: 1010,
-    //   invoiceId: 1,
-    //   productId: 5,
-    //   productName: "Product 5",
-    //   purchasePrice: 7650,
-    //   quantity: 5,
-    //   saleId: 1010,
-    //   subtotal: 150,
-    //   tax: 13.125,
-    //   total: 163.125
-    // }, {
-    //   description: "Added From SSMS",
-    //   id: 1011,
-    //   invoiceId: 1,
-    //   productId: 10,
-    //   productName: "Product 10",
-    //   purchasePrice: 10000,
-    //   quantity: 10,
-    //   saleId: 1010,
-    //   subtotal: 150,
-    //   tax: 13.125,
-    //   total: 163.125
-    // }];
-    // console.log("this.actroute.snapshot.params[\"\"]", this.actroute.snapshot.params[""]);
-    // console.log("this.actroute.snapshot.params[\"id\"]", this.actroute.snapshot.params["id"]);
-    
-    
-    
-
-
     if (+this.actroute.snapshot.params["id"] === 0) {
       this.update = false;
 
@@ -118,7 +86,8 @@ export class AddEditComponent<T> implements OnInit {
 
       this.GenerateFormFromObject(this.displayItem);
 
-      this.saleDetailsData = new TableDataSource<SaleDetail>([]);
+      // this.saleDetailsData = new MatTableDataSource<SaleDetail>([]);
+      this.saleDetailsData = [];
 
 
       this.apiHelper.recsType = this.displayItem.constructor.name;
@@ -127,31 +96,33 @@ export class AddEditComponent<T> implements OnInit {
 
       this.update = true;
 
-      if (this.actroute.snapshot.params[""] === "invoices"){
+      if (this.actroute.snapshot.params[""] === "invoices") {
         this.apiHelper.recsType = "SaleDetail";
         this.IPO = this.apiHelper.getByID<T>(this.actroute.snapshot.params[""], this.actroute.snapshot.params["id"]).pipe(
           switchMap(invoice => {
-            
+
             const inv = new Invoice(invoice);
             console.log("Invoice ONINT", invoice);
             inv.client = invoice["client"];
             // inv.sale.invoiceId = inv.id;
 
-            return this.apiHelper.getRecords('Saledetail',this.actroute.snapshot.params["id"]).pipe(
+            return this.apiHelper.getRecords('Saledetail', this.actroute.snapshot.params["id"]).pipe(
               map((SALEDTS) => {
                 if (!this.apiHelper.objectIsEmpty(SALEDTS)) {
                   const converted = SALEDTS.map(RTSALEDTS => {
-                    return  new SaleDetail(RTSALEDTS)
+                    return new SaleDetail(RTSALEDTS)
                   })
-                  
+
                   inv.saleDetails = converted
-                    this.saleDetailsData = new TableDataSource<SaleDetail>(converted);
-                  
+                  // this.saleDetailsData = new MatTableDataSource<SaleDetail>(converted);
+                  this.saleDetailsData = converted;
+
                   // this.saleDetailsData.FechData(inv.id);
                 } else {
-                  console.log("NO CONVERTED");
+                  console.log("NOT CONVERTED");
 
-                  this.saleDetailsData = new TableDataSource<SaleDetail>([]);
+                  // this.saleDetailsData = new MatTableDataSource<SaleDetail>([]);
+                  this.saleDetailsData = [];
                 }
                 console.log("this.saleDetailsData", this.saleDetailsData);
                 return inv;
@@ -159,38 +130,24 @@ export class AddEditComponent<T> implements OnInit {
             )
           })
         );
-      }else{
+      } else {
         this.IPO = this.apiHelper.getByID(this.actroute.snapshot.params[""], this.actroute.snapshot.params["id"]);
       }
-      
 
-      this.IPO.subscribe(itemprops =>{
+
+      this.IPO.subscribe(itemprops => {
         console.log("itemprops in IPO", itemprops);;
-        
+
         this.apiHelper.recsType = itemprops.constructor.name;
         this.GenerateFormFromObject(itemprops);
       })
-      
+
     }
 
-    console.log("this.displayItem", this.displayItem); 
+    console.log("this.displayItem", this.displayItem);
     console.log("this.itemform", this.itemform);
-    
-  }
-
-  ngAfterViewInit(): void {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
-
-    console.log("this.total AFTER View INIT", this.total);
-    
-
 
   }
-
-  // RedudeTotals(element: any) {
-
-  // }
 
   updateSale(element: any = {}) {
     let formSale: Sale;
@@ -199,53 +156,26 @@ export class AddEditComponent<T> implements OnInit {
     } else {
       formSale = new Sale(this.itemform.get("sale").value);
     }
-    console.log(`Form SALE BEFORE`, this.itemform.get("sale").value);
 
-    // formSale.subTotal += newSaleDetail.subTotal;
     formSale.saleDate = new Date().toISOString();
 
     formSale.cashierId = JSON.parse(window.atob(localStorage.getItem("token").split(".")[1])).id;
-    
-    console.log("element Transfered UPDATE SUB TOTAL", element);
-    
-    const formSaleDetails : SaleDetail[] = this.itemform.get("saleDetails").value
-    // const formSale : Sale = this.itemform.get("sale").value
-    console.log("formSale", formSale);
-    console.log("formSaleDetails", formSaleDetails);
-    
-    if (formSaleDetails) {
-      console.log("formSaleDetails", formSaleDetails);
 
-      console.log("formSale.subTotal, formSale.tax, formSale.total before", formSale.subTotal, formSale.tax, formSale.total);
-      
-      
-      // this.subTotal = formSale.reduce((prev, curr: SaleDetail) => {
-        //   console.log("curr", curr);
-      
-      formSale.subTotal = formSaleDetails.reduce((prev, curr: SaleDetail) => { return prev + (curr.total);},0);
-      formSale.tax = formSaleDetails.reduce((prev, curr: SaleDetail) => { return prev + (curr.tax);},0);
-      if(formSale.tax !== 0){
+    const formSaleDetails: SaleDetail[] = this.itemform.get("saleDetails").value
+    if (formSaleDetails) {
+      formSale.subTotal = formSaleDetails.reduce((prev, curr: SaleDetail) => { return prev + (curr.total); }, 0);
+      formSale.tax = formSaleDetails.reduce((prev, curr: SaleDetail) => { return prev + (curr.tax); }, 0);
+      if (formSale.tax !== 0) {
         formSale.total = formSale.subTotal * formSale.tax;
-      }else{
+      } else {
         formSale.total = formSale.subTotal;
       }
-
       this.itemform.patchValue({ sale: formSale });
-      console.log(`Form SALE AFTER`, this.itemform.get("sale").value);
 
-      console.log("formSale.subTotal, formSale.tax, formSale.total AFTER", formSale.subTotal, formSale.tax, formSale.total);
-      //   return prev + (curr.total);
-      // }, 0);
-
-      // this.tax = formSale.reduce((prev, curr:SaleDetail) => {
-      //   return prev + (curr.tax);
-      // }, 0);
-
-      // this.total += this.subTotal * this.tax;
     }
 
     console.log("this.itemform.value", this.itemform.value);
-    
+
   }
 
 
@@ -253,10 +183,10 @@ export class AddEditComponent<T> implements OnInit {
   onSubmit() {
     console.log("this.itemform.getRawValue()", this.itemform.getRawValue());
     console.log("this.update", this.update);
-    
-    if(this.update){
+
+    if (this.update) {
       this.apiHelper.updateRecord(this.itemform.getRawValue());
-    }else{
+    } else {
       this.apiHelper.saveRecord(this.itemform.getRawValue());
     }
 
@@ -269,34 +199,21 @@ export class AddEditComponent<T> implements OnInit {
     return text;
   }
 
-  // selectedclient(event){
-  //   console.log("selectedclient event", event.option.value);
+  displayFn(option: Client | string): string {
+    console.log("option",typeof option);
+    
+    if (typeof option === "object") {
+      const client = new Client(option);
+      return option = client && client.firstName || client.lastName ? client.getFullName() : '';
+    }
 
-  // }
-
-  displayFn(client: Client): string {
-    // console.log("client from diplayfn before init", client);
-    if(client){
-      client = new Client(client);
-    }else {
-      client = new Client()   // console.log("client from diplayfn", client)
-    }     
-    return client && client.firstName || client.lastName ? client.getFullName() : '';
+    return option
   }
 
 
-  
-  addSaleDetail(){
 
-
-
-    console.log("this.total", this.total);
-    // let InvoiceSDs: SaleDetail[] = []
+  addSaleDetail() {
     const newSaleDetail: SaleDetail = new SaleDetail();
-    
-    // InvoiceSDs = this.tableData$.DATA$.value.map((el) => {
-      //   return new SaleDetail(el);
-      // })
 
     let dialogref = this.dialog.open(DisplayModalComponent, {
       data: newSaleDetail,
@@ -305,72 +222,47 @@ export class AddEditComponent<T> implements OnInit {
 
     dialogref.afterClosed().subscribe((result) => {
       console.log("result", result);
-      if (result === null || result === undefined || typeof result === 'undefined'){
+      if (result === null || result === undefined || typeof result === 'undefined') {
         console.log("result IN THE IF", result);
         return
       }
-        result as SaleDetail;
+      result as SaleDetail;
 
-        this.subTotal = 0
-        this.tax = 0
-        this.total = 0
+      newSaleDetail.invoiceId = +this.actroute.snapshot.params["id"];
+      newSaleDetail.productName = result.product.productName;
+      newSaleDetail.productId = result.product.id;
+      newSaleDetail.description = result.product.description;
+      newSaleDetail.quantity = +result.quantity;
+      newSaleDetail.unitPrice = result.product.retailPrice;
+      newSaleDetail.tax = result.tax;
+      newSaleDetail.subTotal = +result.quantity * +result.product.retailPrice;
+
+      if (newSaleDetail.tax !== 0) {
+        newSaleDetail.total += newSaleDetail.subTotal * newSaleDetail.tax;
+      } else {
+        newSaleDetail.total += newSaleDetail.subTotal;
+      }
 
 
-        newSaleDetail.invoiceId = +this.actroute.snapshot.params["id"];
-        newSaleDetail.productName = result.product.productName;
-        newSaleDetail.productId = result.product.id;
-        newSaleDetail.description = result.product.description;
-        newSaleDetail.quantity = +result.quantity;
-        newSaleDetail.unitPrice = result.product.retailPrice;
-        newSaleDetail.tax = result.tax;
-        newSaleDetail.subTotal = +result.quantity * +result.product.retailPrice;
-
-        if (newSaleDetail.tax !== 0){
-          newSaleDetail.total += newSaleDetail.subTotal * newSaleDetail.tax;
-        }else{
-          newSaleDetail.total += newSaleDetail.subTotal;
-        }
-
-      
-      // let formSaleDetails = this.itemform.get("saleDetails").value;
-      // formSaleDetails.push(newSaleDetail);
-      
-      // this.itemform.patchValue({ saleDetails: formSaleDetails });
-      
       console.log("newsaleDetail", newSaleDetail);
-      
+
       console.log("this.itemform.value", this.itemform.value);
       let formSale: Sale;
-      
-      
+
+
 
       let formSaleDetails = this.itemform.get("saleDetails").value;
       formSaleDetails.push(newSaleDetail);
-      // this.saleDetailsData = new TableDataSource<SaleDetail>(formSaleDetails);
-      this.saleDetailsData.DATA$.next(formSaleDetails);
       
-      
-
-
-      // this.itemform.patchValue({ SaleDetail: formSaleDetails });
-
-      
-      // this.itemform.patchValue({ invoiceNumber: "1234567890" });
-
-      console.log("this.total", this.total);
+      // this.saleDetailsData.data = formSaleDetails;
+      // this.saleDetailsData = new MatTableDataSource<SaleDetail>(formSaleDetails);
+      this.saleDetailsData = formSaleDetails;
 
       this.updateSale();
 
-    
-  });
-  
-  const formSaleDTs = this.itemform.get("saleDetails").value
-    console.log("formSaleDTsOUT", formSaleDTs);
 
+    });
 
-
-    console.log("this.apiHelper.recsType", this.apiHelper.recsType);
-    
   }
 
   //this method is for getting the type of the object injected into this class
@@ -401,15 +293,15 @@ export class AddEditComponent<T> implements OnInit {
   }
 
   autoCompleteIsEmpty(prop): boolean {
-    if (prop.formControlName !== "client") {
-      return true;
-    } else {
+    // if (prop.formControlName !== "client") {
+    //   return true;
+    // } else {
       const formControlValue = this.itemform.get(prop.formControlName).value;
-      
-      if (typeof formControlValue === "object" && formControlValue !== null) {
+
+      if (!formControlValue || typeof formControlValue === "object" && formControlValue !== null) {
         return this.objectHasEmptyProperties(formControlValue);
       }
-    }
+    // }
   }
 
   resetAutoComplete(prop) {
@@ -420,14 +312,14 @@ export class AddEditComponent<T> implements OnInit {
   }
 
   objectHasEmptyProperties(object) {
-    if (Object.values(object).every((x) => x === null || x === "" || x === undefined || x === 0 )) {
+    if (object && Object.values(object).every((x) => x === null || x === "" || x === undefined || x === 0)) {
       return true;
     } else {
       return false;
     }
   }
 
-  add(element){
+  add(element) {
     // let SDs = this.itemform.get("saleDetails").value;
     // console.log("SDs before", SDs);
     // SDs = [...SDs, element]
@@ -441,14 +333,14 @@ export class AddEditComponent<T> implements OnInit {
 
 
   delete(element) {
-    
+
     let SDs = this.itemform.get("saleDetails").value;
     // console.log("SDs before",SDs);
     SDs = SDs.filter(sd => sd.id != element.id)
     // console.log("SDs after",SDs);
     this.itemform.get("saleDetails").setValue(SDs);
     // console.log('this.displayItem.constructor.name',this.displayItem.constructor.name);
-    
+
     // this.apiHelper.deleteRecord(element, "SaleDetail")
   }
 
@@ -462,9 +354,23 @@ export class AddEditComponent<T> implements OnInit {
     return object;
   }
 
+  print() {
+    // window.print();
+    // var divToPrint = document.getElementById('print-area');
+    // var newWin = window.open('', 'Print-Window');
+    // newWin.document.open();
+    // newWin.document.write('<html><link rel="stylesheet" type="text/css" href="../../../styles.scss" media="print"/><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+    // newWin.document.close();
+    // setTimeout(function () {
+    //   newWin.close();
+    // }, 10000);
+
+    console.log("this.itemform.value", this.itemform.value);
+  }
+
   GenerateFormFromObject(object) {
     console.log("GenerateFormFromObject", object);
-    
+
     if (object) {
       this.itemProperties = Object.keys(object).map((prop) => {
         let type = "";
@@ -485,21 +391,24 @@ export class AddEditComponent<T> implements OnInit {
           Included = false;
         }
 
+        if (prop === "status") {
+          needSelectInput = true;
+          // this.SelectOptionsForStatus = Object.values(InvoiceStatus);
+        }
+
 
 
         if (prop === "sale") {
-          if(object[prop] === null){
+          if (object[prop] === null) {
             object[prop] = new Sale();
           }
-          if(object[prop]){
-
-            this.itemform.addControl(
-              prop,
-              this.fb.group(object[prop])
-            );
-            this.itemform.get("sale").disable();
-          }
-          console.log("object[prop] SALE",object[prop]) ;
+          this.itemform.addControl(
+            prop,
+            this.fb.group(object[prop])
+          );
+          this.itemform.get("sale").disable();
+          
+          console.log("object[prop] SALE", object[prop]);
         }
 
         // if (prop === "amountDue") {
@@ -509,43 +418,37 @@ export class AddEditComponent<T> implements OnInit {
 
         if (object[prop] === true || object[prop] === false) {
           isBoolean = true;
+        }
+
+
+        if (prop === "client") {
+          needSelectInput = true;
+          this.isInvoice = true;
+          // this.SelectOptionsForStatus = [1,2,3];
+          this.apiHelper.getClients().subscribe(clients => {
+            this.SelectOptionsForClient = clients;
+          })
+        }
+
+        if (prop.toLowerCase().includes("date")) {
+          needDatePicker = true;
           this.itemform.addControl(
             prop,
-            new FormControl(object[prop])
+            new FormControl(new Date(object[prop]))
           );
-          type = "boolean";
-        } else {
-          if (prop === "client") {
-            needSelectInput = true;
-            this.isInvoice = true;
-            this.apiHelper.getClients().subscribe(clients => {
-              this.selectInputData = clients;
-            })
-
-
-
-
-          }
-
-          if (prop.toLowerCase().includes("date")) {
-            needDatePicker = true;
-            this.itemform.addControl(
-              prop,
-              new FormControl(new Date(object[prop]))
-            );
-          } else {
-            this.itemform.addControl(
-              prop,
-              new FormControl(object[prop])
-            );
-          }
         }
 
         if (object.id != undefined) {
           if (object.id == 0) {
             this.Title = `Add new ${object.constructor.name}`;
           } else {
-            this.Title = `Editing ${object.constructor.name}  ${object.id}`;
+            if (object.constructor.name === "Invoice") {
+
+              this.Title = `Editing ${object.constructor.name}  ${object.invoiceNumber}`;
+            } else {
+
+              this.Title = `Editing ${object.constructor.name}  ${object.id}`;
+            }
           }
         }
 
@@ -610,7 +513,7 @@ export class AddEditComponent<T> implements OnInit {
         this.needTable = false;
         if (prop === "saleDetails") {
           console.log("object for totals", object.sale);
-          
+
           this.needTable = true;
 
           if (object.id != 0) {
@@ -618,35 +521,35 @@ export class AddEditComponent<T> implements OnInit {
             this.apiHelper.getSaleDetailsByInvoiceID(object.id).subscribe(SDTS => {
               console.log("SDTS", SDTS);
 
-              this.saleDetailsData = new TableDataSource<SaleDetail>(SDTS);
+              // this.saleDetailsData = new MatTableDataSource<SaleDetail>(SDTS);
+              this.saleDetailsData = SDTS;
             })
           }
           this.apiHelper.recID = object.id;
-          
-          
-          
+
+
+
         }
-        if (typeof (object[prop]) === "number"){
+        if (typeof (object[prop]) === "number") {
           type = "number";
         }
 
-        if(prop === "retailPrice"){
-          console.log("retailPrice", typeof(object[prop]));
-          
+        if (prop === "retailPrice") {
+          console.log("retailPrice", typeof (object[prop]));
+
         }
-        // type = typeof (object[prop]);
-        
 
-        // console.log("object parameter", object);
+        this.itemform.addControl(
+          prop,
+          new FormControl(object[prop])
+        );
 
-        // this.formControlsArray.push({this.itemform. : this.fb.control("")});
-      
         return {
           labelsText: this.formatText(prop),
           formControlName: prop,
           value: object[prop],
           isBoolean: isBoolean,
-          Included: Included, 
+          Included: Included,
           needTextArea: needTextArea,
           needSelectInput: needSelectInput,
           needDatePicker: needDatePicker,
@@ -654,10 +557,10 @@ export class AddEditComponent<T> implements OnInit {
           width: width,
           type: type
         };
-      }).filter(prop =>{
+      }).filter(prop => {
         return prop.Included
       });
-      
+
     }
     console.log("this.itemProperties", this.itemProperties);
   }

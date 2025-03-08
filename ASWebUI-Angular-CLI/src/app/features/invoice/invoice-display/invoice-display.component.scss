@@ -1,0 +1,177 @@
+h1, h2, h3, p {
+ margin: 0;
+ padding: 0;
+}
+.inv-title{
+        .company-logo h1{
+            // text-align: left;
+            visibility: visible;
+          }
+          .title h1{
+          visibility: visible;
+            // text-align: right;
+        }
+        h1{
+            font-weight: 400;
+            font-size: 2rem;
+            text-align: center;
+        }
+    }
+    .component{
+    padding: 3rem;
+    text-align: left;
+    .inv-title, .bill-section, .payment-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        // align-items: center;
+        
+    }
+
+    
+
+
+    .inv-title > div{
+        width: 40%;
+        text-align: center;
+    }
+
+    .bill-to-details , .invoice-details {
+        width: 40%;
+        // border: 2px solid black;
+        border-radius: .51rem;
+        padding: 1rem;
+        background-color: #c0c0c0;
+    }
+
+    .Payment-details , .total-due {
+        width: 40%;
+        // border: 2px solid black;
+        background-color: #c0c0c0;
+        border-radius: .51rem;
+        padding: 1rem;
+    }
+
+    .bill-to-details > *, .invoice-details > *{
+        width: 100%;
+    }
+
+    .bill-to-name{
+        p{
+            display: inherit;
+            // margin-top: .5rem;
+            // font-size: 1.5rem;
+            // font-weight: 100;
+        }
+    }
+}
+.description{
+  color: gray;
+  // margin-block: .5rem;
+}
+.section-margin{
+  margin-top: 3rem;
+}
+
+.p-title{
+  margin-top: .5rem;  
+}
+
+.bill-to-details .p-title, .invoice-details .p-title{
+  // border: 2px solid black;
+  // transform: translateZ(0);
+  // height: 40px;
+  // position: relative;
+  // top: 2px;
+  // vertical-align: middle;
+  // line-height: 5rem;
+  margin-top: .5rem;
+  p{
+    padding-right: 1rem;
+    display: inline-block;
+  }
+}
+
+table {
+  width: 100%;
+  table-layout: auto;
+  margin: 0;
+  overflow: auto;
+}
+
+// .mat-row {
+//   td {
+//     overflow: hidden;
+//     width: auto;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//   }
+// }
+
+
+.mat-row {
+    // background-color: lighten(grey, 40%);
+  td {
+    max-width: 200px;
+    width: fit-content;
+    min-width: 10px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 0 1rem;
+
+    &:first-child {
+      margin-left: 0;
+      text-align: left;
+      padding-left: 1rem;
+    }
+
+    &:last-child {
+      margin-right: 0;
+      padding: 0 0.5rem;
+    }
+  }
+}
+
+
+.mat-header-row {
+  th {
+    padding: 0 1rem;
+    &:first-child {
+      padding-left: 1rem;
+    }
+  }
+
+  .filterInputs {
+    padding: 0 0.25rem;
+    flex-direction: row;
+    &:first-child {
+      padding-left: 0.5rem;
+    }
+  }
+}
+
+th {
+  button {
+    min-width: 5px;
+    padding: 0.1rem 0.7rem;
+  }
+}
+
+.totals {
+    margin-top: var(--top-space);
+    margin-left: auto;
+    width: 25%;
+    // background-color: dangerblue;
+    div{
+        display: flex;
+        justify-content: space-between;
+        padding: .5rem;
+        label{
+            width: 25%;
+        }
+        input{
+            width: 25%;
+            margin-left: auto
+        }
+    }
+}

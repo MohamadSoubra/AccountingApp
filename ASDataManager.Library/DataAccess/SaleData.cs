@@ -56,6 +56,7 @@ namespace ASDataManager.Library.DataAccess
                     Quantity = item.Quantity,
                     InvoiceId = InvoiceID,
                     Description = item.Description,
+                    UnitPrice = item.UnitPrice,
                     Total = item.Total,
                     Tax = item.Tax,
                     
@@ -70,7 +71,7 @@ namespace ASDataManager.Library.DataAccess
                     throw new Exception($"The product Id of { detail.ProductId } could not be found in the database.");
                 }
 
-                detail.UnitPrice = (productInfo.RetailPrice * detail.Quantity);
+                //detail.UnitPrice = (productInfo.RetailPrice * detail.Quantity);
 
                 if (productInfo.IsTaxable)
                 {

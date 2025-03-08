@@ -14,8 +14,7 @@ import { ActivatedRoute, Router } from "@angular/router";
   styleUrls: ["./products.component.scss"],
 })
 export class ProductsComponent<T extends Identification> implements OnInit {
-  //productList: Product[] = [
-  productList$: TableDataSource<Product>;
+  productList: Product[];
   productsTableColumns = [];
   paginationSizes: any[];
   defaultPageSize: number;
@@ -31,7 +30,7 @@ export class ProductsComponent<T extends Identification> implements OnInit {
     
     this.getProducts();
     // this.productList = this.api.getProducts();
-    console.log("this.productList", this.productList$);
+    console.log("this.productList", this.productList);
     
   }
 
@@ -39,7 +38,7 @@ export class ProductsComponent<T extends Identification> implements OnInit {
     this.api.getProducts().subscribe(products => {
 
 
-      this.productList$ = new TableDataSource(products);
+      this.productList = products;
 
     })
 

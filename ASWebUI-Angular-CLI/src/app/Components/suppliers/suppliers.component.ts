@@ -12,7 +12,7 @@ import { TableDataSource } from 'src/app/sharedFeatures/table/table-datasource';
   styleUrls: ["./suppliers.component.scss"],
 })
 export class SuppliersComponent<T extends Identification> implements OnInit {
-  suppliersList$: TableDataSource<Supplier>;
+  suppliersList: Supplier[];
   suppliersTableColumns: any 
   componentName: string = "Supplier";
 
@@ -25,7 +25,7 @@ export class SuppliersComponent<T extends Identification> implements OnInit {
     // this.suppliersList = this.api.getSuppliers();
     this.initializeColumns()
     this.getSuppliers();
-    console.log("this.suppliersList$", this.suppliersList$);
+    console.log("this.suppliersList$", this.suppliersList);
     
   }
 
@@ -33,8 +33,8 @@ export class SuppliersComponent<T extends Identification> implements OnInit {
     this.api.getSuppliers().subscribe(suppliers => {
       console.log("suppliers", suppliers);
       
-      this.suppliersList$ = new TableDataSource(suppliers);
-      console.log("this.suppliersList$", this.suppliersList$);
+      this.suppliersList = suppliers;
+      console.log("this.suppliersList$", this.suppliersList);
       
     });
   }

@@ -14,7 +14,6 @@ BEGIN
 	set nocount on;
 	set IDENTITY_INSERT [dbo].[Invoice] OFF ;
 	update dbo.Invoice set 
-	InvoiceNumber = ISNULL(@InvoiceNumber, InvoiceNumber), 
 	ClientId = ISNULL(@ClientId, ClientId),
 	[Description] = ISNULL(@Description, [Description]),
 	InvoiceDate = ISNULL(@InvoiceDate, InvoiceDate),

@@ -3,10 +3,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { map } from "rxjs/operators";
 import { Observable, of as observableOf, merge, BehaviorSubject } from "rxjs";
-import { Identification } from "src/app/models/Identification.interface";
 import { MatTableDataSource } from "@angular/material/table";
-import { EventEmitter } from "@angular/core";
-import { ApiHelperService } from "src/app/services/ApiHelper.service";
 
 
 /**
@@ -28,12 +25,8 @@ export class TableDataSource<T> extends DataSource<T> {
   // filter: string;
   // columnName: string;
   // filterObject: any;
-  //datasource: T[] = [], 
-  // constructor(private apihelper: ApiHelperService<T[]>) {
   constructor(data:T[]) {
     super();
-    //this.data = datasource;
-    //this.DATA$ = new BehaviorSubject(datasource);
     this.DATA$.next(data);
 
   }
@@ -60,7 +53,8 @@ export class TableDataSource<T> extends DataSource<T> {
     return merge(...dataMutations);
 */
 
-    
+    console.log("Datasource Paginator", this.paginator);
+
     let dataMutations;
 
     if (this.sort && this.paginator) {
@@ -101,6 +95,7 @@ export class TableDataSource<T> extends DataSource<T> {
             );
           } else if (!this.paginator && !this.sort) {
             console.log("NO Sort or Paginator");
+            
             dataMutations = [this.DATA$, this.filterChange$];
             
             return merge(...dataMutations).pipe(
@@ -160,10 +155,10 @@ export class TableDataSource<T> extends DataSource<T> {
    */
   private getPagedData(data: T[]) {
     // if(this.paginator){
-      // console.log(`this.paginator is ${this.paginator}`);
-      // console.log(`this.paginator.pageSize is ${this.paginator.pageSize}`);
-      // console.log(`this.paginator.pageIndex is  ${this.paginator.pageIndex}`);
-      // console.log(`this.paginator.getNumberOfPages is  ${this.paginator.getNumberOfPages()}`);
+      console.log(`this.paginator is ${this.paginator}`);
+      console.log(`this.paginator.pageSize is ${this.paginator.pageSize}`);
+      console.log(`this.paginator.pageIndex is  ${this.paginator.pageIndex}`);
+      console.log(`this.paginator.getNumberOfPages is  ${this.paginator.getNumberOfPages()}`);
 
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     if (
@@ -223,6 +218,8 @@ export class TableDataSource<T> extends DataSource<T> {
     //console.log(this.columnName);
     //console.log(data);
     //console.log(this.filterChange$.value);
+    console.log("filter");
+    
 
     if (!this.filterChange$.value || this.filterChange$.value === "") {
       if (this.paginator) {
@@ -296,53 +293,6 @@ export class TableDataSource<T> extends DataSource<T> {
     );
   }
 
-  // FechData(RecId :number = 0): void{
-  //   // this.apihelper.getInvoices().subscribe(data =>{
-  //   //   this.DATA$.next(data);
-  //   // })
-  //   console.log("FechData RecId", RecId);
-    
-  //   console.log("this.apihelper.recsType", this.apihelper.recsType);
-
-  //   if(RecId === 0){
-  //     this.apihelper.getRecords<T>(this.apihelper.recsType).subscribe(recs => {
-
-  //       this.DATA$.next(recs);
-
-  //     })
-  //   }else{
-
-  //     this.apihelper.getRecords<T>(this.apihelper.recsType, RecId).subscribe(recs => {
-  //       // if (this.sort && this.paginator) {
-
-
-  //       //   return this.DATA$.next(this.getSortedData(this.getPagedData(this.getFilteredData(recs))));
-
-  //       // } else if (!this.sort && this.paginator) {
-
-  //       //   return this.DATA$.next(this.getPagedData(this.getFilteredData(recs)));
-
-  //       // } else if (!this.paginator && this.sort) {
-
-  //       //   return this.DATA$.next(this.getSortedData(this.getFilteredData(recs)));
-
-  //       // } else if (!this.paginator && !this.sort) {
-  //       //   return this.DATA$.next(this.getFilteredData(recs));
-  //       // }
-  //       console.log("recs", recs);
-  //       console.log("RecId", RecId);
-  //       console.log("this.apihelper.recsType", this.apihelper.recsType);
-        
-  //       this.DATA$.next(recs);
-
-  //     })
-
-  //   }
-    
-    
-  //   console.log("this.DATA$ in table-datasource",this.DATA$);
-    
-  // }
 
 
 }

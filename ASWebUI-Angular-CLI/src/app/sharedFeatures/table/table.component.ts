@@ -16,15 +16,8 @@ import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
 import { BehaviorSubject, Observable } from "rxjs";
-import { Client } from "src/app/models/client.model";
 import { Identification } from "src/app/models/Identification.interface";
-import { Invoice } from "src/app/models/invoice.model";
-import { Product } from "src/app/models/product.model";
-import { SaleDetail } from "src/app/models/sale-detail.model";
-import { Supplier } from "src/app/models/supplier.model";
 import { ApiHelperService } from "src/app/services/ApiHelper.service";
-import { AddEditComponent } from "../add-edit/add-edit.component";
-import { DisplayModalComponent } from "../modal/displayModal.component";
 // import { DisplayModalComponent } from "src/app/shared/modal/displayModal.component";
 import { TableDataSource } from "./table-datasource";
 
@@ -32,7 +25,7 @@ export interface TableColumn {
   name: string; // column name
   dataKey: string; // name of key of the actual data in this column
   nestedProperty?: string; //name of the property if data contains nested ojects
-  position?: "right" | "left" | "center"; // should it be right-aligned or left-aligned?
+  position?: "right" | "left" | "center"; // should table cell data be right-aligned or left-aligned or centered? !!!! feature not working
   isSortable?: boolean; // can a column be sorted?
   isFilterable?: boolean; // can a column be filterd?
 }
@@ -46,13 +39,14 @@ export class TableComponent<T extends Identification> implements OnInit, AfterVi
 {
   
   public displayedColumns: string[];
+  public displayedRows: string[];
 
   @ViewChild(MatPaginator, { static: false }) matPaginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) matSort: MatSort;
 
   @Input() isPageable = false;
   @Input() isSortable = false;
-  @Input() isFilterable;
+  @Input() isFilterable = false;
   @Input() tableColumns: TableColumn[];
   @Input() hasActionColumn = false;
   @Input() hasCheckboxColumn = false;
@@ -72,22 +66,27 @@ export class TableComponent<T extends Identification> implements OnInit, AfterVi
 
   // @Input() InputData$: TableDataSource<T>;
   ///// !!!!!!!! Recently changed to make reloading table data work without an event emitter to table component
-  // tableData$: TableDataSource<T>;
-  @Input() tableData$: TableDataSource<T>;
-
-  // @Input() set tableData(data: any[]) {
-  //   this.setTableDataSource(data);
+  // tableDataSource: TableDataSource<T>;
+  // @Input() set tableData(data){
+  //   this.tableDataSource = new TableDataSource<T>(data);
+  //   this.tableDataSource.paginator = this.matPaginator;
+  //   this.tableDataSource.sort = this.matSort;
+  //   console.log("this.matPaginator ON SET", this.matPaginator);
+    
   // }
+  @Input() tableData:any[];
 
-  //@Output() pageevent: PageEvent;
 
   filterInputs = {};
   filterObject: any;
-  pagedData: MatTableDataSource<any>;
+  // pagedData: MatTableDataSource<any>;
   isColumnFiltered = false;
   selection = new SelectionModel<any>(true, []);
   ActionColumn: string;
   CheckboxColumn: string;
+
+  // tableDataSource : TableDataSource<T>;
+  tableDataSource : MatTableDataSource<T>;
 
   // newTableDataSource : any = [];
 
@@ -103,61 +102,59 @@ export class TableComponent<T extends Identification> implements OnInit, AfterVi
     private api: ApiHelperService<T>,
     private router: Router,
     private actRout: ActivatedRoute,
-    private cd: ChangeDetectorRef
+    // private cd: ChangeDetectorRef
   ) {
 
     
   }
 
   ngOnInit(): void {
-    
-    this.InitialzeColumns();
-    console.log("this.tableData", this.tableData$);
-    // console.log("this.InputData", this.InputData$);
 
+    this.InitialzeColumns();
+    console.log("this.tableData", this.tableData);
+    
+    this.tableDataSource = new MatTableDataSource<T>(this.tableData);
+    // this.tableDataSource = new MatTableDataSource<T>(this.tableData.map(item => Object.keys(item).)));
+    // console.log("this.tableDataSource", this.tableDataSource);
+    // console.log("this.InputData", this.InputData$);
+    
     // this.newTableDataSource$.FechData();
     // console.log("this.isPageable", this.isPageable);,
     // console.log("this.newTableDataSource$ ngOnINIT", this.newTableDataSource$); 
-  
     
-    
-    // this.newTableDataSource$.paginator = this.matPaginator;
-    
-    // this.newTableDataSource$.sort = this.matSort;
-    
-    // this.newTableDataSource$ = new TableDataSource(this.api);
-    // this.newTableDataSource$.FechData();
-    
-  // we need this, in order to make pagination work with *ngIf
-}
-ngAfterViewInit() {
-  // console.log("Table in AfterviewINIT");
-  // this.newTableDataSource$ = new TableDataSource(this.api);
-  // this.tableData$ = this.InputData$;
-
-
-  // this.newTableDataSource$.paginator = this.matPaginator;
-  // console.log("this.matpaginator",this.matPaginator);
-  
-  if (this.isPageable){
-    this.tableData$.paginator = this.matPaginator;
-    this.cd.detectChanges();
+    console.log("this.matPaginator VIEW CHILD ONINIT", this.matPaginator);
+    // we need this, in order to make pagination work with *ngIf
   }
+  ngAfterViewInit() {
+    // this.tableDataSource = new TableDataSource<T>(this.tableData);
+    
+    // console.log("this.tableDataSource.paginator", this.tableDataSource.paginator);
+    // console.log("this.matPaginator VIEW CHILD", this.matPaginator);
   
-  // this.newTableDataSource$.sort = this.matSort;
-  if (this.isSortable){
-    this.tableData$.sort = this.matSort;
-  }
   
-  // console.log("this.tableData$.DATA$.value.length", this.tableData$.DATA$.value.length);
-  // console.log("this.tableData$.DATA$", this.tableData$.DATA$);
+    console.log("this.isPageable",this.isPageable);
+    if (this.isPageable){
+      console.log("this.isPageable",this.isPageable);
+      
+      this.tableDataSource.paginator = this.matPaginator;
+      // this.tableDataSource.connect();
+      // this.cd.detectChanges();
+    }
+  
+    if (this.isSortable){
+      this.tableDataSource.sort = this.matSort;
+    }
+    console.log("this.tableDataSource.paginator", this.tableDataSource.paginator);
+    
+    // console.log("this.tableDataSource.DATA$.value.length", this.tableDataSource.DATA$.value.length);
+    // console.log("this.tableDataSource.DATA$", this.tableDataSource.DATA$);
 
-  // if(this.tableData$.DATA$.value.length <= 0){
+    // if(this.tableDataSource.DATA$.value.length <= 0){
 
-  //   // this.newTableDataSource$.FechData();
-  // }
+    //   // this.newTableDataSource$.FechData();
+    // }
 
-  // this.tableData$.FechData(this.api.recID);
+    // this.tableDataSource.FechData(this.api.recID);
     
     // console.log("this.newTableDataSource$ ngAfterViewInit", this.newTableDataSource$);
 
@@ -181,7 +178,7 @@ ngAfterViewInit() {
     //Added ChangeDetectorRef for the error ExpressionChangedAfterItHasBeenCheckedError
     //got this error after assigning data to the datasource in NgAfterViewInit function
     //since paginator only get initialized in NgAfterViewInit
-    this.cd.detectChanges();
+    // this.cd.detectChanges();
     // console.log("this.newTableDataSource$", this.newTableDataSource$);
     
   }
@@ -211,7 +208,7 @@ ngAfterViewInit() {
     
     // console.log(JSON.stringify(data));
     const test = data.splice(startIndex, this.matPaginator.pageSize);
-console.log('test',test);
+    console.log('test',test);
     
     return test;
   }
@@ -232,37 +229,50 @@ console.log('test',test);
 
   Add(element: T){
 
-    console.log("this.tableData$",this.tableData$);
+    console.log("this.tableDataSource",this.tableDataSource);
     
 
     console.log("element in table component add",element);
     
-    // let dataT: any = this.tableData$.DATA$.value
+    // let dataT: any = this.tableDataSource.DATA$.value
     // // dataT.push(element);
-    // this.tableData$.DATA$.next(dataT);
+    // this.tableDataSource.DATA$.next(dataT);
 
     // this.onAdd.emit(element);
     // this.api.saveRecord(element);
+  }
+
+  view(item) {
+
+    // this.router.navigate(["invoicedisplay"], {
+    //   relativeTo: this.actRout,
+    // });
+    this.router.navigate(["display", item.id], {
+      relativeTo: this.actRout,
+    });
+
+    
+    // this.router.navigate(["invoicedisplay",item.id]);
   }
 
   delete(element) {
     // let record: any = this.newTableDataSource$.DATA$.value.filter(
     //   (el) => el != element
     // );
-    if (this.tableData$.DATA$.value.length == 1) {
-      this.tableData$.DATA$.next([]);
-    }else{
-      let data: any = this.tableData$.DATA$.value.filter(
-        (el) => el != element
-      );
-      // this.newTableDataSource$.DATA$.next(data);
-      this.tableData$.DATA$.next(data);
-    }
+    // if (this.tableDataSource.DATA$.value.length == 1) {
+    //   this.tableDataSource.DATA$.next([]);
+    // }else{
+    //   let data: any = this.tableDataSource.DATA$.value.filter(
+    //     (el) => el != element
+    //   );
+    //   // this.newTableDataSource$.DATA$.next(data);
+    //   this.tableDataSource.DATA$.next(data);
+    // }
     
     
     if (this.matPaginator){
       // this.newTableDataSource$.paginator = this.matPaginator;
-      this.tableData$.paginator = this.matPaginator;
+      this.tableDataSource.paginator = this.matPaginator;
       if (this.matPaginator.pageIndex >= this.matPaginator.getNumberOfPages()) {
         this.matPaginator.previousPage();
       }
@@ -276,12 +286,7 @@ console.log('test',test);
   }
 
   setTableDataSource(data: any[]) {
-    // this.newTableDataSource$ = new TableDataSource<T>(data);
-    // this.newTableDataSource$.sort = new MatSort();
-    this.tableData$.sort = new MatSort();
-    // console.log("this.matPaginator",this.matPaginator);
     
-    // console.log("this.newTableDataSource", this.newTableDataSource);
   }
 
   clearFilters() {
@@ -329,6 +334,8 @@ console.log('test',test);
     //this.tableDataSource.columnName = column;
   }
 
+
+
   applyFilter(event: Event, filter: string[]) {
     if (
       Object.keys(this.filterInputs).every(
@@ -352,15 +359,15 @@ console.log('test',test);
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     // return
-    // console.log(this.tableData);
+    // console.log(this.tableDataSource);
 
     const numSelected = this.selection.selected.length;
     let numRows
 
     // if (this.newTableDataSource$ && this.newTableDataSource$.DATA$){
-    if (this.tableData$ && this.tableData$.DATA$){
+    if (this.tableDataSource && this.tableDataSource.data){
 
-      numRows = this.tableData$.DATA$.value.length;
+      numRows = this.tableDataSource.data.length;
     }else{
       numRows = 0;
     }
@@ -379,7 +386,7 @@ console.log('test',test);
       return;
     }
     // this.selection.select(...this.newTableDataSource$.DATA$.value);
-    this.selection.select(...this.tableData$.DATA$.value);
+    this.selection.select(...this.tableDataSource.data);
   }
 
   /** The label for the checkbox on the passed row */
@@ -394,7 +401,7 @@ console.log('test',test);
   }
 
   ngAfterContentChecked() {
-    //console.log(this.tableData);
+    //console.log(this.tableDataSource);
     // console.log(
     //   "this.matPaginator in ngAfterContentChecked",
     //   this.matPaginator
@@ -402,7 +409,7 @@ console.log('test',test);
     // this.tableDataItems.paginator = this.matPaginator;
     //this.tableDataItems.sort = this.matSort;
     // this.table.dataSource = this.tableDataItems;
-    // this.tableDataItems = new TableDataSource(this.tableData);
+    // this.tableDataItems = new TableDataSource(this.tableDataSource);
   }
 
   batchDelete() {
@@ -460,9 +467,11 @@ console.log('test',test);
 
   InitialzeColumns() {
     console.log("this.tableColumns", this.tableColumns);
+
+
     
     const columnNames = this.tableColumns.map(
-      (tableColumn: TableColumn) => tableColumn.name
+      (tableColumn: TableColumn) => tableColumn.dataKey
     );
     if (this.hasActionColumn) {
       this.ActionColumn = "ActionColumn";
@@ -480,6 +489,14 @@ console.log('test',test);
     } else {
       this.displayedColumns = columnNames;
     }
+
+    this.displayedRows = this.tableColumns.map(
+      (tableColumn: TableColumn) => tableColumn.dataKey
+    );
+
+    console.log("this.displayedColumns", this.displayedColumns);
+    console.log("this.displayedRows", this.displayedRows);
+    
 
     if (this.isFilterable) {
       this.displayedColumnFilters = this.tableColumns

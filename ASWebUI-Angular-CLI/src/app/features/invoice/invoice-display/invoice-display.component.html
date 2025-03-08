@@ -1,0 +1,114 @@
+<div class="invoice component">
+        <div class="invoice-info">
+            <div class="inv-title">
+                <div class="company-logo">
+                    <h1>Company Name</h1>
+                </div>
+                <div class="title">
+                    <h1>INVOICE</h1>
+                </div>
+            </div>
+            <div class="bill-section section-margin">
+
+                <div class="bill-to-details">
+                    <div class="bill-to-title">
+                        <h2>Bill To:</h2>
+                    </div>
+                    <div class="bill-to-name p-title">
+                        <p>{{invoice.client.firstName}} {{invoice.client.lastName}}</p>
+                    </div>
+                    <div class="p-title">
+                        <p>{{invoice.client.phoneNumber}}</p>
+                    </div>
+                    <div class="p-title">
+                        <p>{{invoice.client.address}}</p>
+                    </div>
+                    <div class="p-title">
+                        <p>{{invoice.client.emailAddress}}</p>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <div class="invoice-title">
+                        <h2>Invoice Details:</h2>
+                    </div>
+                    <div class="p-title">
+                        <p>Invoice No:</p>
+                        <span>{{invoice.invoiceNumber}}</span>
+                    </div>
+                    <div class="p-title">
+                        <p>Invoice Date:</p>
+                        <span>{{invoice.invoiceDate}}</span>
+                    </div>
+                    <div class="p-title">
+                        <p>Due Date:</p>
+                        <span>{{invoice.paymentDueDate}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="payment-section section-margin">
+                <div class="Payment-details">
+                    <div class="main_title">
+                        <h2>Payment Method</h2>
+                    </div>
+                    <div class="p_title">
+                        <p>Paypal:</p>
+                        <span>###-###-#####-###</span>
+                    </div>
+                    <div class="p_title">
+                        <p>Card Payment:</p>
+                        <span>Visa, MasterCard, Paypal</span>
+                    </div>
+                </div>
+                <div class="total-due">
+                    <div class="main_title">
+                        <h2>Total Due</h2>
+                    </div>
+                    <div class="p_title">
+                        <p>Amout In USD:</p>
+                        <span>{{invoice.amountDue}}</span>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <div class="OrderDetails section-margin">
+        
+            <table mat-table #table  [dataSource]="saleDetailsData">
+        
+                <!-- Position Column -->
+                <ng-container matColumnDef="productName">
+                    <th mat-header-cell *matHeaderCellDef> Item </th>
+                    <td mat-cell *matCellDef="let element"> {{element.productName}}<p class="description">{{element.description}}</p> </td>
+                    
+                </ng-container>
+        
+                <!-- Name Column -->
+                <ng-container matColumnDef="quantity">
+                    <th mat-header-cell *matHeaderCellDef> Quantity </th>
+                    <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+                </ng-container>
+        
+                <!-- Weight Column -->
+                <ng-container matColumnDef="unitPrice">
+                    <th mat-header-cell *matHeaderCellDef> Unit Price </th>
+                    <td mat-cell *matCellDef="let element"> {{element.unitPrice | currency:'$ '}} </td>
+                </ng-container>
+        
+                <!-- Symbol Column-->
+                <ng-container matColumnDef="total">
+                    <th mat-header-cell *matHeaderCellDef> Total </th>
+                    <td mat-cell *matCellDef="let element"> {{element.total | currency:'$ '}} </td>
+                </ng-container>
+         
+                <tr mat-header-row *matHeaderRowDef="tableColumnsHeader"></tr>
+                <tr mat-row *matRowDef="let row; columns:tableColumnsHeader"></tr>
+            </table>
+        </div>
+
+        <div class="totals">
+            <div><mat-label> Subtotal : </mat-label> <span>{{invoice.sale.subTotal | currency:'$ '}}</span></div>
+            <div><mat-label> Tax :  </mat-label> <span>{{invoice.sale.tax | currency:'$ '}}</span> </div>
+            <div><mat-label> Total : </mat-label> <span>{{invoice.sale.total | currency:'$ '}}</span> </div>
+        </div>
+
+
+    </div>

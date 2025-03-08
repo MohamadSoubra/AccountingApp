@@ -57,7 +57,7 @@ export class AuthService {
 
           //this.accessToken = JSON.parse(atob(token.token.split(".")[1]));
           const decodedToken = this.decodeToken(response.accessToken);
-          console.log("decodedToken",decodedToken);
+          // console.log("decodedToken",decodedToken);
           
           this.refreshTokenString = response.refreshToken;
 
@@ -121,7 +121,7 @@ export class AuthService {
     const storedToken = localStorage.getItem("token");
     if (this.isTokenValid(storedToken)) {
       const token = this.decodeToken(storedToken);
-      console.log("decodedtoken", token);
+      // console.log("decodedtoken", token);
       
       const user = new User(
         token.id,

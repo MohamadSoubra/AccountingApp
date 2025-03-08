@@ -2,9 +2,6 @@
 @use "src/customMaterialTheme.scss" as cmt;
 
 .componentTop {
-  // display: flex;
-  // flex-wrap: wrap;
-  // align-items: center;
   border-radius: 0.5rem 0.5rem 0 0;
 
   .table-top {
@@ -21,10 +18,6 @@
     }
 
     .action-buttons {
-      // position: absolute;
-      // top: 50%;
-      // transform: translateY(-50%);
-      // right: 0;
       width: fit-content;
       margin: auto;
       padding: 1rem;
@@ -38,7 +31,6 @@
   }
 
   .searchInput {
-    // position: relative;
     width: 100%;
     margin: auto;
     padding: 1rem;
@@ -47,33 +39,14 @@
     }
   }
   .input-container {
-    // background-color: orange;
-
-    // display: flex;
-    // justify-content: space-between;
     width: 100%;
-
-    // flex-grow: 1;
-    // display: flex;
-    // justify-content: flex-end;
-    // margin-left: auto;
     .invoiceInfo {
       width: 100%;
       display: flex;
       flex-wrap: wrap;
-      // flex-direction: column;
-      // margin-right: 1rem;
-      // width: 20%;
-      // display: flex;
-      // justify-content: center;
     }
 
-    // .invoiceInfo > :first-child{
-    //   align-self: flex-start;
-    //   margin-right: auto;
-    // }
     .invoiceInfo > * {
-      // width: fit-content;
       padding: 1rem;
       flex-grow: 1;
     }
@@ -87,6 +60,9 @@
   button {
     margin: 0.25rem;
   }
+  .mat-stroked-button{
+    min-width: fit-content !important;
+  }
 }
 
 .mat-form-field > .mat-form-field-wrapper {
@@ -97,8 +73,7 @@
 
 .tableContainer {
   background-color: white;
-  margin-top: var(--top-space);
-  // border: 1px solid black;
+  // margin-top: var(--top-space);
 }
 
 .tableScroll {
@@ -115,15 +90,10 @@ table {
 table,
 .tableContainer {
   border-radius: 0.5rem;
-  //overflow: auto;
 }
 
 .mat-row {
-  // position: relative;
-  //background-color: burlywood;
-  //width: 100%;
   td {
-    // height: 300px;
     overflow: hidden;
     width: auto;
     text-overflow: ellipsis;
@@ -131,27 +101,9 @@ table,
   }
 }
 
-// .mat-header-cell:nth-child(1),
-// .mat-cell:nth-child(1) {
-//   //padding: 0 0.1rem;
-//   // //width: 10%;
-//   // text-align: center;
-//   // background-color: yellow;
-//   // overflow: auto;
-// }
 
 .mat-row {
-    background-color: lighten(grey, 40%); //lighten(cmt.$accent, 40%);
-  // position: relative;
-  //  td:not(:first-child):not(:last-child){
-
-  //    padding: 0 1rem;
-  //    background-color: blue;
-
-  //   }
-  //   th:not(:first-child):not(:last-child){
-  //     background-color: yellow;
-  //   }
+    background-color: lighten(grey, 40%);
   td {
     max-width: 200px;
     width: fit-content;
@@ -162,80 +114,33 @@ table,
 
     &:first-child {
       margin-left: 0;
-      // background-color: yellow;
-      // position: sticky;
-      // display: block;
-      // padding: 0 5%;
       text-align: left;
       padding-left: 1rem;
-      // width: 100%;
-      // margin: 0 auto;
     }
 
     &:last-child {
-      // background-color: yellow;
       margin-right: 0;
       padding: 0 0.5rem;
     }
   }
 }
 
-// .mat-header-row th:nth-child(-n+2), .mat-row td:nth-child(-n+2){
-//   display: table-cell;
-//   background-color: inherit;
-//   position: sticky;
-//   z-index: 2;
-// }
-
-// .mat-header-row th:first-child, .mat-row td:first-child{
-//   left: 0;
-// }
-
-// .mat-header-row th:nth-child(2), .mat-row td:nth-child(2){
-//   left: 45px;
-// }
-
-// .mat-row td:nth-child(2){
-//     background-color: gray;
-
-// }
 
 .mat-header-row {
   th {
     padding: 0 1rem;
-
-    // &:not(.filterInputs) {
-    //   // padding: 0 3rem;
-    //   // background-color: orange;
-    // }
     &:first-child {
-      // margin-left: 0;
-      // background-color: yellow;
       padding-left: 1rem;
     }
-
-    // &:last-child {
-    //   // background-color: yellow;
-    //   // margin-right: 0;
-    //   // padding: 0 0.5rem;
-    // }
   }
 
   .filterInputs {
     padding: 0 0.25rem;
     flex-direction: row;
-
-    // background-color: pink;
     &:first-child {
-      // margin: 0 auto;
-      // background-color: yellow;
       padding-left: 0.5rem;
     }
 
-    // .clearButtontd {
-    //   //padding: 0 1rem !important;
-    //   //margin: 0 1rem;
-    // }
     .clearButton {
       display: block;
       margin: 0 auto;
@@ -254,31 +159,9 @@ th {
   }
 }
 
-// mat-form-field{
-//   flex-grow: 1;
-// }
-
 .mat-row:nth-child(2n + 1) {
   background-color: white; //lighten(cmt.$accent, 40%);
 }
-
-// .input-group{
-//   // position: relative;
-//   // background-color: blue;
-//   button {
-//     // position: absolute;
-//     // top: 50%;
-//     // transform: translateY(-50%);
-//     // right: 0;
-//     // z-index: 9999;
-//     // min-width: 15px !important;
-//     // line-height: 2;
-//     // padding: 5px;
-//     mat-icon{
-//       // padding: 1rem;
-//     }
-//   }
-// }
 
 .cursor-pointer {
   cursor: pointer;
@@ -286,17 +169,8 @@ th {
 
 tr.mat-row:hover {
   visibility: inherit;
-  // background-color: lighten(cmt.$accent, 40%);
 }
 
-// #tabledataheight {
-//   //min-height: 100px;
-//   //height: 105px;
-//   //height: calc(100vh - 155px);
-//   //background-color: red;
-//   //background-color: yellow;
-//   //border: 20px solid blue;
-// }
 
 mat-paginator {
   // visibility: visible;
@@ -304,11 +178,6 @@ mat-paginator {
   //position: sticky;
   border-radius: 0 0 0.5rem 0.5rem;
 }
-
-// th,
-// td {
-//   padding: 10px !important;
-// }
 
 .text-right {
   text-align: right !important;

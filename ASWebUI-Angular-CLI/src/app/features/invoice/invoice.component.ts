@@ -7,7 +7,7 @@ import { Client } from "src/app/models/client.model";
 import { ApiHelperService } from "src/app/services/ApiHelper.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Identification } from "src/app/models/Identification.interface";
-import { TableDataSource } from "src/app/sharedFeatures/table/table-datasource";
+// import { TableDataSource } from "src/app/sharedFeatures/table/table-datasource";
 // import { TableColumn } from "../../Components/table/table.component";
 
 @Component({
@@ -16,7 +16,7 @@ import { TableDataSource } from "src/app/sharedFeatures/table/table-datasource";
   styleUrls: ["./invoice.component.scss"],
 })
 export class InvoiceComponent<T extends Identification> implements OnInit {
-  InvoiceList$ : TableDataSource<Invoice>;
+  InvoiceList : Invoice[];
   invoice: Invoice;
   client: Client;
   invoicesTableColumns = [];
@@ -38,17 +38,9 @@ export class InvoiceComponent<T extends Identification> implements OnInit {
   ngOnInit() {
     
     this.initializeColumns();
-    // this.Clients = this.api.getClients();
-    // this.getClients();
-    // console.log("this.Clients", this.Clients);
     this.getInvoices();
-    
-    // this.InvoiceList$.FechData();
-  
 
-    console.log("this.InvoiceList", this.InvoiceList$);
-
-    // const InvoiceArray = this.getdummyInvoices().map(i => i.clientname = i.client.firstName);
+    console.log("this.InvoiceList", this.InvoiceList);
 
     this.filteredClients = this.myControl.valueChanges.pipe(
       startWith(""),
@@ -58,14 +50,15 @@ export class InvoiceComponent<T extends Identification> implements OnInit {
   }
 
   getInvoices(): void{
-    // this.getClients();
-    // console.log("this.Clients",this.Clients);                                          
-    
     this.api.getInvoices().subscribe(invoices => {
       this.api.getClients().subscribe(clients => {
         console.log("clients in get invs", clients);
         
-        invoices.map(inv => {
+        this.InvoiceList = invoices.map(inv => {
+          inv = new Invoice(inv);
+          inv.invoiceDate = new Date(inv.invoiceDate).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+          inv.paymentDueDate = new Date(inv.paymentDueDate).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+          
           clients.map(cli =>{
             const INvoice = new Invoice(inv)
             const CLient = new Client(cli);
@@ -73,11 +66,9 @@ export class InvoiceComponent<T extends Identification> implements OnInit {
               INvoice.client = CLient;
             }
           })
+          return inv
         })
       })
-      
-      this.InvoiceList$ = new TableDataSource(invoices);
-      
     })
 
     // this.InvoiceList$ = new TableDataSource<T>(this.api.getInvoices<T>());
@@ -130,7 +121,6 @@ export class InvoiceComponent<T extends Identification> implements OnInit {
         {
           name: "Invoice Number",
           dataKey: "invoiceNumber",
-          // dataKey: "id",
           isSortable: true,
           isFilterable: true,
         },

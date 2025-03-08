@@ -13,9 +13,9 @@
     </div>
   </div>
   
-<div class="container-fluid" *ngIf="clientList$">
+<div class="container-fluid" *ngIf="clientList">
   <app-table
-    [tableData$]="clientList$"
+    [tableData]="clientList"
     [tableColumns]="clientTableColumns"
     [isPageable]="true"
     [isFilterable]="false"

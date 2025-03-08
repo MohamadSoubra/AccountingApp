@@ -124,7 +124,7 @@ export class ApiHelperService<T> {
     // );
 
     const res = this.http.get<Invoice[]>(`${this.rootUrl}/api/invoice`)
-    console.log(" getInvoices result", res);
+    // console.log(" getInvoices result", res);
     return res;
 
     // return this.http.get<Invoice[]>(`${this.rootUrl}/api/invoice`).pipe(
@@ -610,6 +610,7 @@ export class ApiHelperService<T> {
 
   getByID<T>(ObjectTypeAsString, ID){
     console.log("object getByID", ObjectTypeAsString);
+    console.log("ID", ID);
     // console.log("object.constructor.name", object.constructor.name);
     let result;
     switch (ObjectTypeAsString) {
@@ -624,6 +625,8 @@ export class ApiHelperService<T> {
       break;
       case "invoices":
       result = this.getInvoiceById(ID);
+        console.log("getByID Invoices Result", result);
+      
       break;
       // case "saleDetails":
       // object = this.getSaleDetailById(ID);

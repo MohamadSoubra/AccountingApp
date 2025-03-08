@@ -1,6 +1,6 @@
 <!-- <div class="topbackground"> TEST </div> -->
 <!-- <p *ngIf="displayItem"> displayItem not empty {{displayItem | json}}</p> -->
-<div class="modal roundBorders">
+<div id="print-area" class="modal roundBorders">
 
     <div class="title">
         <div>
@@ -27,7 +27,7 @@
                 </ng-container>
                 <!-- ||| Table ||| -->
                 <ng-container *ngIf="prop.needTable">
-                    <app-table class="tableEmbed" [componentName]="'SaleDetail'" [ngClass]="prop.formControlName" [tableData$]="saleDetailsData" [tableColumns]="saledetailscolumns" [isPageable]="false"
+                    <app-table class="tableEmbed" [componentName]="'SaleDetail'" [ngClass]="prop.formControlName" [tableData]="saleDetailsData" [tableColumns]="saledetailscolumns" [isPageable]="false"
                     [isFilterable]="false" [hasActionColumn]="true" [isSortable]="false"
                     [hasCheckboxColumn]="false"  (actionEdit)="edit($event)" (actionAdd)="add($event)" 
                     (actionDelete)="delete($event)"> </app-table>
@@ -45,10 +45,21 @@
                         <mat-label>{{prop.labelsText}}</mat-label>
                         <input type="text" matInput [formControlName]="prop.formControlName"  [matAutocomplete]="auto">
                         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" >
-                            <mat-option (click)="AddClient()">Add Client</mat-option>
-                            <mat-option *ngFor="let data of selectInputData" [value]="data">
-                                {{data.firstName +" "+ data.lastName}}
-                            </mat-option>
+                            <ng-container *ngIf="prop.formControlName == 'status'">
+
+                                <mat-option (click)="AddClient()">Add Status</mat-option>
+                                <mat-option *ngFor="let status of SelectOptionsForStatus; let i=index" [value]="status">
+                                     {{invoiceStatusDisplay[status]}}
+                                </mat-option>
+                            </ng-container>
+                            <ng-container *ngIf="prop.formControlName == 'client'">
+
+                                <mat-option (click)="AddClient()">Add Client</mat-option>
+                                <mat-option *ngFor="let data of SelectOptionsForClient; let i=index" [value]="data">
+                                    {{data.firstName +" "+ data.lastName}}
+                                </mat-option>
+                            </ng-container>
+
                         </mat-autocomplete>
                         <button type="button" *ngIf="!autoCompleteIsEmpty(prop)" matSuffix mat-icon-button
                             aria-label="Clear" (click)="resetAutoComplete(prop)">
@@ -84,45 +95,15 @@
                         <mat-label> {{ prop.labelsText }} </mat-label>
                         <input matInput [type]="prop.type" placeholder="" color="primary" [formControlName]="prop.formControlName">
                     </mat-form-field>
-                    <!-- <label for="prop.formControlName">{{ prop.labelsText }}</label>
-                 <input placeholder="" name="prop.formControlName" [formControlName]="prop.formControlName"> -->
 
                 </ng-container>
-                <!-- <mat-form-field appearance="outline"> -->
-                <!-- <mat-label> {{ prop.labelsText }} </mat-label> -->
-                <!-- <input matInput placeholder="" [formControlName]="prop.formControlName"> -->
-                <!-- </mat-form-field> -->
-
 
                 <ng-container *ngIf="prop.formControlName == 'sale'">
-                    <!-- <mat-form-field  aria-disabled="true" appearance="outline" [ngClass]="prop.formControlName">
-                                        <mat-label> {{ prop.labelsText }} </mat-label>
-                                        <input matInput placeholder="" color="primary" [formControlName]="prop.formControlName">
-                                    </mat-form-field> -->
                     <ng-container>
                         <div formGroupName="sale" class="totals">
-                            
-                            <!-- <div> <mat-label> Sub Total : </mat-label> <input disabled matInput [formControlName]="prop.value.subTotal"/> </div> -->
-                            <!-- 
-                            <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="subTotal">
-                            <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="tax">
-                            <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="total"> -->
-                            <!-- <mat-form-field  appearance="outline" [ngClass]="prop.formControlName">
-                                <mat-label> Sub Total </mat-label>
-                                <input matInput [type]="prop.type" placeholder="" color="primary" formControlName="subTotal">
-                            </mat-form-field> -->
-                            <!-- <mat-form-field  appearance="outline" [ngClass]="prop.formControlName">
-                                <mat-label> Sub Total </mat-label>
-                                <input matInput [type]="prop.type" placeholder="" color="primary" formControlName="tax">
-                            </mat-form-field>
-                            <mat-form-field  appearance="outline" [ngClass]="prop.formControlName">
-                                <mat-label> Sub Total </mat-label>
-                                <input matInput [type]="prop.type" placeholder="" color="primary" formControlName="total">
-                            </mat-form-field> -->
                             <div> <mat-label> Subtotal :    </mat-label> <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="subTotal"> </div>
                             <div> <mat-label> Tax :         </mat-label> <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="tax"> </div>
                             <div> <mat-label> Total :       </mat-label> <input matInput [attr.disabled]="true" [type]="prop.type" placeholder="" color="primary" formControlName="total"> </div>
-                
                         </div>
                     </ng-container>
                 </ng-container>
@@ -139,6 +120,7 @@
    
     <div class="dialog-actions">
         <button mat-stroked-button (click)="Cancel()">Cancel</button>
+        <button mat-stroked-button (click)="print()">Print</button>
         <button mat-stroked-button class="ml" type="button" (click)="onSubmit()"
             color="primary">Save</button>
     </div>

@@ -42,7 +42,7 @@
   --primary-light: #{cmt.$primary-light};
   --accent: #{cmt.$accent};
   --top-space: 3rem;
-
+  // font-size: 16px;
 }
 //$background: cmt.get-color;
 
@@ -76,7 +76,6 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .DisplayModal mat-dialog-container {
   background-color: var(--primary-light);//cmt.$primary-light !important;
@@ -132,4 +131,35 @@ th .mat-form-field-infix{
   text-align: center;
   margin: var(--top-space) auto;
   position: relative;
+}
+
+@media print {
+  app-header { display: none; }
+  app-root { display: block; }
+  html,
+  body,
+  .approot,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a ,
+  td,
+  th{
+  //  font-size: 1rem !important;
+  }
+
+  html,
+  body,
+  .approot{
+   background-color: white;
+   margin: 0;
+   padding: 0;
+  }
+
+    
+
 }

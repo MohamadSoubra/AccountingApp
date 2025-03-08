@@ -15,12 +15,13 @@
 
 
 
-    <div class="container-fluid" *ngIf="InvoiceList$">
+    <div class="container-fluid" *ngIf="InvoiceList">
         <app-table 
-        [tableData$]="InvoiceList$" 
+        [tableData]="InvoiceList" 
         [tableColumns]="invoicesTableColumns" 
         [isPageable]="true"
-        [isFilterable]="false" 
+        [isSortable]="false"
+        [isFilterable]="true" 
         [paginationSizes]="" 
         [defaultPageSize]="" 
         [hasActionColumn]="true"

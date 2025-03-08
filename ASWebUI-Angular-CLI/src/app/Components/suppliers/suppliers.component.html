@@ -13,9 +13,9 @@
         </div>
     </div>
     
-    <div class="container-fluid" *ngIf="suppliersList$">
+    <div class="container-fluid" *ngIf="suppliersList">
     <app-table 
-    [tableData$]="suppliersList$" 
+    [tableData]="suppliersList" 
     [tableColumns]="suppliersTableColumns" 
     [isPageable]="true" 
     [isFilterable]="false"
@@ -25,8 +25,7 @@
     [hasCheckboxColumn]="true"
     [componentName]="componentName"
     (actionDelete)="delete($event)">
-    <!-- (actionEdit)="edit($event)"-->
-</app-table>
+    </app-table>
 
 </div>
 

@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Invoice]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [InvoiceNumber] AS 'INV-' + CAST(Id AS VARCHAR(5)),
+    [InvoiceNumber] AS 'INV-' + RIGHT('000000' + CAST(Id AS VARCHAR(5)) , 6),
     [ClientId] INT NOT NULL, 
     [Description] VARCHAR(MAX) NULL, 
     [InvoiceDate] DATETIME2 NOT NULL DEFAULT getutcdate(), 

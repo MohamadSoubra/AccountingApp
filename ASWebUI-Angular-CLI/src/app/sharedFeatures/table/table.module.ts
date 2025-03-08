@@ -8,6 +8,7 @@ import { DataPropertyGetterPipe } from './data-property-getter/data-property-get
 
 
 @NgModule({
+  // declarations: [TableComponent, DataPropertyGetterPipe],
   declarations: [TableComponent, DataPropertyGetterPipe],
   imports: [CommonModule, AngularMaterialModule, FormsModule],
   exports: [TableComponent, DataPropertyGetterPipe],

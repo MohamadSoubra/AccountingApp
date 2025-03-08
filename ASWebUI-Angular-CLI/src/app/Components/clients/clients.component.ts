@@ -12,7 +12,7 @@ import { TableDataSource } from 'src/app/sharedFeatures/table/table-datasource';
   styleUrls: ["./clients.component.scss"],
 })
 export class ClientsComponent<T extends Identification> implements OnInit {
-  clientList$ : TableDataSource<Client>;
+  clientList : Client[];
   clientTableColumns: any;
   componentName: string = "Client";
   paginationSizes: any[];
@@ -27,7 +27,7 @@ export class ClientsComponent<T extends Identification> implements OnInit {
   ngOnInit() {
     this.initializeColumns();
     this.getClients();
-    console.log("this.clientList", this.clientList$);
+    console.log("this.clientList", this.clientList);
     
   }
 
@@ -35,7 +35,7 @@ export class ClientsComponent<T extends Identification> implements OnInit {
     this.api.getClients().subscribe(clients => {
 
 
-      this.clientList$ = new TableDataSource(clients);
+      this.clientList = clients;
 
     })
   }

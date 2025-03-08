@@ -3,16 +3,26 @@ import { Identification } from "./Identification.interface";
 import { SaleDetail } from "./sale-detail.model";
 import { Sale } from "./sale.model";
 
-// interface ClientName{
-//   [client: string]: string | number;
-// }
+export enum InvoiceStatus {
+  Pending = "Pending",
+  Paid = "Paid",
+  Overdue = "Overdue",
+  Draft = "Draft",
+}
+
+export const InvoiceStatus2LabelMapping: Record<InvoiceStatus, string> = {
+  [InvoiceStatus.Pending] : "Pending",
+  [InvoiceStatus.Paid] : "Paid",
+  [InvoiceStatus.Overdue] : "Overdue",
+  [InvoiceStatus.Draft] : "Draft",
+};
 
 export class Invoice implements Identification {
   id: number;
   // [client: string | number]: string | number | Client;
   client?: Client ;
   // clientId: number;
-  status: string;
+  status: InvoiceStatus;
   sale? : Sale;
   invoiceNumber: string;
   description: string;
@@ -30,10 +40,10 @@ export class Invoice implements Identification {
     invoiceNumber = "",
     client = new Client(),
     // clientId = 0,
-    status = "Pending",
+    status = InvoiceStatus.Draft,
     description = "",
-    invoiceDate = new Date().toString(),
-    paymentDueDate = new Date().toString(),
+    invoiceDate = new Date().toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }),
+    paymentDueDate = new Date().toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }),
     amountDue = 0,
     saleDetails = [],
     sale = new Sale()
@@ -42,12 +52,12 @@ export class Invoice implements Identification {
     this.invoiceNumber = invoiceNumber;
     // this.clientId = clientId;
     this.client = client;
-    this.status = status;
+    this.status = InvoiceStatus.Pending;
     this.description = description;
-    this.invoiceDate = invoiceDate;
-    this.paymentDueDate = paymentDueDate;
+    this.invoiceDate = new Date(invoiceDate).toLocaleDateString("en-US",{day :"2-digit", month:"short", year:"numeric"});
+    this.paymentDueDate = new Date(paymentDueDate).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
     this.amountDue = amountDue;
     this.saleDetails = saleDetails;
-    this.sale=sale;
+    this.sale = sale;
   }
 }
