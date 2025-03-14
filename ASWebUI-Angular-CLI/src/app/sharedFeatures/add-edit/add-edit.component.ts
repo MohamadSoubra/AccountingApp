@@ -174,7 +174,7 @@ export class AddEditComponent<T> implements OnInit {
 
     }
 
-    console.log("this.itemform.value", this.itemform.value);
+    console.log("this.itemform.value UPDATESALE()", this.itemform.value);
 
   }
 
@@ -246,7 +246,7 @@ export class AddEditComponent<T> implements OnInit {
 
       console.log("newsaleDetail", newSaleDetail);
 
-      console.log("this.itemform.value", this.itemform.value);
+      console.log("this.itemform.value ADDSALEDETAIL()", this.itemform.value);
       let formSale: Sale;
 
 

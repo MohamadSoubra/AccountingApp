@@ -2,12 +2,14 @@
 using AccountingSoftwareApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +36,11 @@ namespace AccountingSoftwareApi.Identity
             _roleManager = roleManager;
             _tokenValidationParameters = tokenValidationParameters;
             _config = config;
+        }
+
+        public async void RegisterAsync(IdentityUser user, string password)
+        {
+            await _userManager.CreateAsync(user,password);
         }
 
         public async Task<AuthenticationResult> LoginAsync(string email, string password)

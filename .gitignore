@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/ASWebUI-Angular-CLI/src/environments/environment.ts
+/AccountingSoftwareDatabase/PublishLocation/ASDatabase.publish.sql
+/AccountingSoftwareApi/Migrations/ApplicationDbContextModelSnapshot.cs

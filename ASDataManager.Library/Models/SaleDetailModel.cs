@@ -12,7 +12,7 @@ namespace ASDataManager.Library.Models
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
-        public int UnitPrice { get; set; }
+        public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Tax { get; set; }

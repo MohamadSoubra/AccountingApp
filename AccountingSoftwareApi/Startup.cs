@@ -40,6 +40,11 @@ namespace AccountingSoftwareApi
 
             //MvcOptions.EnableEndPointRouting = false;
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            });
+
 
             //App Services
             services.AddTransient<IInventoryData, InventoryData>();

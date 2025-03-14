@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AccountingSoftwareApi.Data;
 using AccountingSoftwareApi.Models;
@@ -117,6 +118,83 @@ namespace AccountingSoftwareApi.Controllers
 
             await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
 
+        }
+
+        [AllowAnonymous]
+        [Route("Admin/Register")]
+        [HttpPost]
+        public async Task<ActionResult> RegisterUser([FromBody] RegisterUserModel registerUser)
+        {
+            //var result = await _userManager.CreateAsync(new IdentityUser{UserName = reguser.EmailAddress, Email = reguser.EmailAddress }, reguser.Password);
+            //if ( result.Succeeded)
+            //{
+            //    var aspuser = from u in _context.Users
+            //                 where u.Email == reguser.EmailAddress
+            //                    select u.Id;
+            //    string userID = aspuser.FirstOrDefault().ToString();
+
+            //    _userData.RegisterUser(new UserModel { Id= userID, FirstName = reguser.FirstName, LastName = reguser.LastName, EmailAddress = reguser.EmailAddress });
+
+            //}
+
+            if (registerUser == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            bool isEmail = Regex.IsMatch(registerUser.EmailAddress, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+            if (!isEmail)
+            {
+                return BadRequest("Email is not Valid");
+            }
+
+            UserModel user = new UserModel
+            {
+                UserName = registerUser.UserName,
+                FirstName = registerUser.FirstName,
+                LastName = registerUser.LastName,
+                EmailAddress = registerUser.EmailAddress,
+            };
+
+            IdentityUser identityUser = new IdentityUser
+            {
+                UserName = registerUser.UserName,
+                Email = registerUser.EmailAddress,
+
+            };
+
+            IdentityResult result;
+
+            foreach (IPasswordValidator<IdentityUser> passwordValidator in _userManager.PasswordValidators)
+            {
+                result = await passwordValidator.ValidateAsync(_userManager, identityUser, registerUser.Password);
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+            }
+
+            identityUser.PasswordHash = _userManager.PasswordHasher.HashPassword(identityUser, registerUser.Password);
+            result = await _userManager.CreateAsync(identityUser);
+
+            if (result.Succeeded)
+            {
+                var aspuser = from u in _context.Users
+                              where u.Email == registerUser.EmailAddress
+                              select u.Id;
+                string userID = aspuser.FirstOrDefault().ToString();
+
+                _userData.RegisterUser(new UserModel { Id = userID, FirstName = registerUser.FirstName, LastName = registerUser.LastName, EmailAddress = registerUser.EmailAddress });
+
+            }
+
+            return Ok();
         }
     }
 }

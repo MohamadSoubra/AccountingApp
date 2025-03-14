@@ -24,5 +24,11 @@ namespace ASDataManager.Library.DataAccess
 
             return output;
         }
+
+        public void RegisterUser(UserModel user)
+        {
+            //var UserID = _sql.QueryData<string, dynamic>("dbo.spUser_GetUserID_FromEmail", new { user.EmailAddress }, "ASDatabase");
+            var output = _sql.SaveData<UserModel>("dbo.spUser_Insert", new UserModel { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, EmailAddress = user.EmailAddress, CreatedDate = user.CreatedDate}, "ASDatabase");
+        }
     }
 }
