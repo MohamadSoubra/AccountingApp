@@ -1,5 +1,7 @@
 ﻿using AccountingSoftwareApi.Data;
 using AccountingSoftwareApi.Models;
+using ASDataManager.Library.DataAccess;
+using ASDataManager.Library.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -7,11 +9,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AccountingSoftwareApi.Identity
@@ -23,24 +27,99 @@ namespace AccountingSoftwareApi.Identity
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IConfiguration _config;
-
+        private readonly IUserData _userData;
 
         public IdentityService(ApplicationDbContext context,
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             TokenValidationParameters tokenValidationParameters,
-            IConfiguration config)
+            IConfiguration config,
+            IUserData _userData)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenValidationParameters = tokenValidationParameters;
             _config = config;
+            this._userData = _userData;
         }
 
-        public async void RegisterAsync(IdentityUser user, string password)
+        public async Task<AuthenticationResult> RegisterAsync(RegisterUserModel registerUser)
         {
-            await _userManager.CreateAsync(user,password);
+
+            bool isEmail = Regex.IsMatch(registerUser.EmailAddress, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+            if (!isEmail)
+            {
+                return new AuthenticationResult
+                {   
+                    Success = false,
+                    Errors = new[] { "Email is not Valid" }
+                };
+            }
+
+            UserModel user = new UserModel
+            {
+                UserName = registerUser.UserName,
+                FirstName = registerUser.FirstName,
+                LastName = registerUser.LastName,
+                EmailAddress = registerUser.EmailAddress,
+            };
+
+            IdentityUser identityUser = new IdentityUser
+            {
+                UserName = registerUser.UserName,
+                Email = registerUser.EmailAddress,
+
+            };
+
+            IdentityResult result;
+
+            foreach (IPasswordValidator<IdentityUser> passwordValidator in _userManager.PasswordValidators)
+            {
+                result = await passwordValidator.ValidateAsync(_userManager, identityUser, registerUser.Password);
+
+                if (!result.Succeeded)
+                {
+                    return new AuthenticationResult
+                    {
+                        Success = false,
+                        Errors = result.Errors.Select(e => e.Description)
+                    };
+                }
+            }
+
+            identityUser.PasswordHash = _userManager.PasswordHasher.HashPassword(identityUser, registerUser.Password);
+            result = await _userManager.CreateAsync(identityUser);
+
+            if (result.Succeeded)
+            {
+                var aspuser = from u in _context.Users
+                              where u.Email == registerUser.EmailAddress
+                              select u.Id;
+                var ASPUserId = aspuser.FirstOrDefault().ToString();
+
+                user.Id = ASPUserId;
+
+                foreach(var role in registerUser.UserRoles)
+                {
+                    role.UserId = ASPUserId;
+                }
+
+                _userData.RegisterUser(user);
+                await _userManager.AddToRolesAsync(identityUser, registerUser.UserRoles.Select( x => x.RoleName ));
+
+                return await GenerateAuthenticationResultForUserAsync(identityUser);
+
+
+            }
+
+            return new AuthenticationResult
+            {
+                Success = false,
+                Errors = result.Errors.Select(e => e.Description)
+            };
+            
+            //await _userManager.CreateAsync(user,password);
         }
 
         public async Task<AuthenticationResult> LoginAsync(string email, string password)
@@ -51,6 +130,7 @@ namespace AccountingSoftwareApi.Identity
             {
                 return new AuthenticationResult
                 {
+                    Success = false,
                     Errors = new[] { "User does not exist" }
                 };
             }
@@ -61,6 +141,7 @@ namespace AccountingSoftwareApi.Identity
             {
                 return new AuthenticationResult
                 {
+                    Success = false,
                     Errors = new[] { "User/password combination is wrong" }
                 };
             }
@@ -163,7 +244,7 @@ namespace AccountingSoftwareApi.Identity
             var claims = new List<Claim>
             {
                 //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),// user.UserName was user.Id
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("id", user.Id)
@@ -213,6 +294,8 @@ namespace AccountingSoftwareApi.Identity
             return new AuthenticationResult
             {
                 Success = true,
+                Email = user.Email,
+                Username = user.UserName,
                 AccessToken = tokenHandler.WriteToken(token),
                 RefreshToken = refreshToken.Token
             };

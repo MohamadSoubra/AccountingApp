@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using AccountingSoftwareApi.Models;
+using System.Threading.Tasks;
 
 namespace AccountingSoftwareApi.Identity
 {
@@ -6,5 +7,6 @@ namespace AccountingSoftwareApi.Identity
     {
         Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken);
         Task<AuthenticationResult> LoginAsync(string email, string password);
+        Task<AuthenticationResult> RegisterAsync(RegisterUserModel registerUser);
     }
 }

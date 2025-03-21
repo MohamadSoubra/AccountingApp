@@ -82,9 +82,9 @@ namespace ASDataManager.Library.DataAccess
 
         public void UpdateInvoiceRecord(InvoiceModel invoice, string cashierId, bool update)
         {
-            var Invoicelookup = _sql.LoadData<InvoiceDBModel, dynamic>("spInvoice_GetById", new { Id = invoice.Id }, "ASDatabase").FirstOrDefault();
-            var clientLookup = _sql.LoadData<ClientModel, dynamic>("spClient_GetById", new { Id = invoice.Client.Id }, "ASDatabase").FirstOrDefault();
-            var SaleLookup = _sql.LoadData<SaleDBModel, dynamic>("spClient_GetById", new { Id = invoice.Sale.Id }, "ASDatabase").FirstOrDefault();
+            var Invoicelookup = _sql.LoadData<InvoiceDBModel, dynamic>("spInvoice_GetById", new { invoice.Id }, "ASDatabase").FirstOrDefault();
+            var clientLookup = _sql.LoadData<ClientModel, dynamic>("spClient_GetById", new { invoice.Client.Id }, "ASDatabase").FirstOrDefault();
+            var SaleLookup = _sql.LoadData<SaleDBModel, dynamic>("spSale_lookup", new { invoice.Sale.Id }, "ASDatabase").FirstOrDefault();
 
             if (Invoicelookup != null)
             {

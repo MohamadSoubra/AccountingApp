@@ -50,7 +50,7 @@ namespace AccountingSoftwareApi.Controllers
 
             setTokenCookie(authResponse.RefreshToken);
 
-            return new AuthenticationResult { Username = email, AccessToken = authResponse.AccessToken, RefreshToken = authResponse.RefreshToken, Success = true };
+            return new AuthenticationResult { Username = authResponse.Username,Email = authResponse.Email, AccessToken = authResponse.AccessToken, RefreshToken = authResponse.RefreshToken, Success = true };
         }
 
         private async Task<bool> IsValidUsernameAndPassword(string email, string password)

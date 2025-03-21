@@ -57,7 +57,7 @@ namespace AccountingSoftwareApi.Controllers
         [HttpPost]
         public void PostInvoice([FromBody] InvoiceModel invoice)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = User.FindFirstValue("Id");
 
             _invoiceData.SaveInvoiceRecord(invoice, userId);
         } 
@@ -67,7 +67,7 @@ namespace AccountingSoftwareApi.Controllers
         [HttpPut]
         public void UpdateInvoice([FromBody] InvoiceModel invoice)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = User.FindFirstValue("Id");
 
             _invoiceData.SaveInvoiceRecord(invoice, userId, true);
         }

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AccountingSoftwareApi.Data;
+using AccountingSoftwareApi.Identity;
 using AccountingSoftwareApi.Models;
 using ASDataManager.Library.DataAccess;
 using ASDataManager.Library.Models;
@@ -27,16 +28,19 @@ namespace AccountingSoftwareApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserData _userData;
         private readonly ILogger _logger;
+        private readonly IIdentityService _identityService;
 
         public UserController(ApplicationDbContext context, 
                              UserManager<IdentityUser> userManager,
                              IUserData userData,
-                             ILogger<UserController> logger)
+                             ILogger<UserController> logger,
+                             IIdentityService identityService)
         {
             _context = context;
             _userManager = userManager;
             _userData = userData;
             _logger = logger;
+            _identityService = identityService;
         }
 
         [HttpGet]
@@ -77,12 +81,13 @@ namespace AccountingSoftwareApi.Controllers
             return output;
         }
 
+        [AllowAnonymous]
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllRoles")]
-        public Dictionary<string, string> GetAllRoles()
+        public List<string> GetAllRoles()
         {
-            var roles = _context.Roles.ToDictionary(x => x.Id, x => x.Name);
+            var roles = _context.Roles.Select(x => x.Name).ToList();
 
             return roles;
 
@@ -125,17 +130,6 @@ namespace AccountingSoftwareApi.Controllers
         [HttpPost]
         public async Task<ActionResult> RegisterUser([FromBody] RegisterUserModel registerUser)
         {
-            //var result = await _userManager.CreateAsync(new IdentityUser{UserName = reguser.EmailAddress, Email = reguser.EmailAddress }, reguser.Password);
-            //if ( result.Succeeded)
-            //{
-            //    var aspuser = from u in _context.Users
-            //                 where u.Email == reguser.EmailAddress
-            //                    select u.Id;
-            //    string userID = aspuser.FirstOrDefault().ToString();
-
-            //    _userData.RegisterUser(new UserModel { Id= userID, FirstName = reguser.FirstName, LastName = reguser.LastName, EmailAddress = reguser.EmailAddress });
-
-            //}
 
             if (registerUser == null)
             {
@@ -147,54 +141,16 @@ namespace AccountingSoftwareApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            bool isEmail = Regex.IsMatch(registerUser.EmailAddress, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
-            if (!isEmail)
+            var result = await _identityService.RegisterAsync(registerUser);
+
+            if (result.Errors != null)
             {
-                return BadRequest("Email is not Valid");
+                return BadRequest(result.Errors);
             }
-
-            UserModel user = new UserModel
+            else
             {
-                UserName = registerUser.UserName,
-                FirstName = registerUser.FirstName,
-                LastName = registerUser.LastName,
-                EmailAddress = registerUser.EmailAddress,
-            };
-
-            IdentityUser identityUser = new IdentityUser
-            {
-                UserName = registerUser.UserName,
-                Email = registerUser.EmailAddress,
-
-            };
-
-            IdentityResult result;
-
-            foreach (IPasswordValidator<IdentityUser> passwordValidator in _userManager.PasswordValidators)
-            {
-                result = await passwordValidator.ValidateAsync(_userManager, identityUser, registerUser.Password);
-
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.Errors);
-                }
+                return Ok(result);
             }
-
-            identityUser.PasswordHash = _userManager.PasswordHasher.HashPassword(identityUser, registerUser.Password);
-            result = await _userManager.CreateAsync(identityUser);
-
-            if (result.Succeeded)
-            {
-                var aspuser = from u in _context.Users
-                              where u.Email == registerUser.EmailAddress
-                              select u.Id;
-                string userID = aspuser.FirstOrDefault().ToString();
-
-                _userData.RegisterUser(new UserModel { Id = userID, FirstName = registerUser.FirstName, LastName = registerUser.LastName, EmailAddress = registerUser.EmailAddress });
-
-            }
-
-            return Ok();
         }
     }
 }
