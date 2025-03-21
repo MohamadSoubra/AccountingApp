@@ -1,5 +1,5 @@
 export class User {
   
-  constructor(public id: string ="", public email: string = "",public  token: string = "") {
+  constructor(public id: string ="",public username: string="", public email: string = "",public  token: string = "") {
   }
 }

@@ -13,9 +13,11 @@ import { Token } from "../models/token.model";
 import { User } from "../models/User.model";
 import { mapTo, tap, catchError, count } from "rxjs/operators";
 import { Router } from "@angular/router";
-import { AuthResponse } from "./auth-response.model";
-import { accessToken } from "./accessToken.model";
+import { AuthResponse } from "./Models/auth-response.model";
+import { accessToken } from "./Models/accessToken.model";
 import { environment } from "src/environments/environment";
+import { RegistrationRequest } from "./Models/RegistrationRequest.model";
+import { Role } from "./Models/Role.model";
 
 @Injectable({
   providedIn: "root",
@@ -70,7 +72,11 @@ export class AuthService {
             user.id = decodedToken.id;
             user.email = decodedToken.email;
             user.token = response.accessToken;
+            user.username = decodedToken.sub;
           }
+
+          console.log("User in Authservice",this.user);
+          
 
           this.user.next(user);
 
@@ -126,6 +132,7 @@ export class AuthService {
       const user = new User(
         token.id,
         token.email,
+        token.sub,
         storedToken,
     );
       
@@ -200,6 +207,7 @@ export class AuthService {
           const user = new User();
           user.id = decodedtoken.id;
           user.email = decodedtoken.email;
+          user.username = decodedtoken.sub;
           user.token = tokens.token;
           this.user.next(user);
 
@@ -265,7 +273,7 @@ export class AuthService {
     }else{
 
       const decodedToken = JSON.parse(window.atob(token.split(".")[1]));
-      // console.log("decodedToken", decodedToken);
+      console.log("decodedToken", decodedToken);
       
       return decodedToken;
     }
@@ -274,19 +282,12 @@ export class AuthService {
   redirecttoLogin() {
     this.router.navigate["/login"];
   }
-  // storeToken(token: Token) {
-  //   return localStorage.setItem("JWT", token.access_token);
-  // }
+  
+  RegisterUser(regRequest :RegistrationRequest){
+    return this.http.post<AuthResponse>(this.rootUrl + "/api/User/Admin/Register",regRequest).subscribe();
+  }
 
-  // doLoginUser(email: string, token: Token) {
-  //   this.storeToken(token);
-  // }
-
-  // getJwtToken() {
-  //   return localStorage.getItem("JWT");
-  // }
-
-  // isLoggedin() {
-  //   return !!this.getJwtToken();
-  // }
+  GetRoles(){
+    return this.http.get<[]>(this.rootUrl + "/api/User/Admin/GetAllRoles")
+  }
 }

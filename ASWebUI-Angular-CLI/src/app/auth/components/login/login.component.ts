@@ -7,7 +7,7 @@ import {
 import { ApiHelperService } from "src/app/services/ApiHelper.service";
 import { User } from "src/app/models/User.model";
 import { authUser } from "src/app/models/authUser.model";
-import { NgForm } from "@angular/forms";
+import { FormBuilder, NgForm, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { HomeComponent } from "src/app/Components/home/home.component";
 import { AuthService } from "../../auth.service";
@@ -24,16 +24,26 @@ export class LoginComponent implements OnInit {
   user: authUser;
   error: string = null;
   isloading = false;
-  email: string;
-  password: string;
+  // email: string;
+  // password: string;
   returnUrl: string;
+  passwordVisible:boolean = false;
+
+  loginForm = this.fb.group({
+    emailAddress: [,[Validators.required,Validators.email]],
+    password: [,Validators.required]
+  })
   //loggedin = false;
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private fb: FormBuilder
   ) {}
   //declare var $:any;
+
+  get emailAddress() { return this.loginForm.get('emailAddress'); }
+  get password() { return this.loginForm.get('password'); }
 
   ngOnInit(): void {
     //this.user.username = "mhmd@email.com",
@@ -56,18 +66,18 @@ export class LoginComponent implements OnInit {
     console.log("Submitted");
   }
 
-  onSubmit(form: NgForm) {
+  onSubmit() {
     //this.user = form.value
     //console.log(this.user);
     //console.log(form);
-    if (!form.valid) {
+    if (!this.loginForm.valid) {
       return;
     }
     this.isloading = true;
-    this.authService.loginUser(form.value.email, form.value.password).subscribe(
+    this.authService.loginUser(this.loginForm.value.emailAddress, this.loginForm.value.password).subscribe(
       (loggedin) => {
         if (loggedin) {
-          form.resetForm();
+          // this.loginForm.resetForm();
           this.router.navigate([this.returnUrl]);
           console.log("Loggedin");
           this.error = null;

@@ -1,1 +1,22 @@
 @import "src/app/auth/components/login/login.component"; 
+
+.login{
+    margin-top: 1rem;
+}
+
+.firstName, .lastName{
+    // display: inline-block;
+    // width: 40%;
+}
+
+.password, .confirmPassword{
+    width: 100%;
+}
+
+.permissions{
+    width: 100%;
+}
+
+.registerbtn{
+    width: 100%;
+}

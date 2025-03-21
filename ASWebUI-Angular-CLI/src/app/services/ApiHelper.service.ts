@@ -7,7 +7,6 @@ import { AuthService } from "../auth/auth.service";
 import { Client } from "../models/client.model";
 import { Invoice } from "../models/invoice.model";
 import { SaleDetail } from "../models/sale-detail.model";
-import { Identification } from "../models/Identification.interface";
 import { Sale } from "../models/sale.model";
 import { User } from "../models/User.model";
 import { Supplier } from "../models/supplier.model";
@@ -20,21 +19,13 @@ import { environment } from "src/environments/environment";
 export class ApiHelperService<T> {
   rootUrl: string = environment.apiUrl;
   objectbyId: any;
-  // Data$: BehaviorSubject<Product[]|Client[]|Supplier[]|Invoice[]>;
-  // Data$: BehaviorSubject<T[]>;
   recsType :string;
   recID: number;
 
-  constructor(private http: HttpClient, private authService: AuthService) {
-    
-  }
-
-
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
 
   getProducts(): Observable<Product[]> {
-    // return this.ParseJSONArray(this.fakeProducts);
-
     return this.http.get<Product[]>(`${this.rootUrl}/api/product`).pipe(
       map((products: Product[]) => {
         return products
@@ -45,123 +36,40 @@ export class ApiHelperService<T> {
         return throwError(error);
       })
     );
-
-    /*
-    return this.authService.user.pipe(
-      take(1),
-      exhaustMap((user) => {
-        console.log("from api service");
-
-        console.log(user);
-
-        if (
-          user == null ||
-          (user == undefined && !this.authService.isTokenValid(user.token))
-        ) {
-          this.authService.redirecttoLogin();
-        }
-
-        if (!this.authService.isTokenValid(user.token)) {
-          this.authService.refreshToken(user.token);
-        }
-        return this.http.get(`${this.rootUrl}/api/product`).pipe(
-          tap((products: Product[]) => {
-            return products;
-          })
-        );
-      })
-    );
-    */
-    // .subscribe(
-    //   (products) => {
-    //     console.log(products);
-    //     return products;
-    //   },
-    //   (erorr) => {
-    //     this.authService.testRefreshTokenforProducts();
-    //   }
-    // );
   }
 
   getClients(): Observable<Client[]> {
-  // getClients() : Observable<Client[]> {
-    // return this.ParseJSONArray(this.fakeClients);
-
-    // return this.http.get(`${this.rootUrl}/api/client`).pipe(
-    //   map((clients: Client[]) => {
-    //     return clients;
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-
-    //     console.log(error);
-
-    //     return throwError(error);
-    //   })
-    // );
-
-    // return this.http.get<Client[]>(`${this.rootUrl}/api/client`)
     return this.http.get<Client[]>(`${this.rootUrl}/api/client`);
   }
 
   getInvoices(): Observable<Invoice[]> {
-  // getInvoices(): Observable<Invoice[]> {
-
-    // return this.ParseJSONArray(this.fakeInvoices);
-    // return this.fakeInvoices;
-
-    // return this.http.get(`${this.rootUrl}/api/invoice`).pipe(
-    //   map((invoices: Invoice[]) => {
-    //     return invoices;
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-
-    //     console.log(error);
-
-    //     return throwError(error);
-    //   })
-    // );
-
-    const res = this.http.get<Invoice[]>(`${this.rootUrl}/api/invoice`)
-    // console.log(" getInvoices result", res);
-    return res;
-
-    // return this.http.get<Invoice[]>(`${this.rootUrl}/api/invoice`).pipe(
-    //   map((invoices: Invoice[]) => {
-    //     // this.Data$.next(invoices);
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-    //     console.log(error);
-    //     return throwError(error);
-    //   })
-    // );
-    // return this.http.get<T[]>(`${this.rootUrl}/api/invoice`);
-    // return of();
-
-    
+    return this.http.get<Invoice[]>(`${this.rootUrl}/api/invoice`)
   }
-
 
   saveInvoice(invoice: Invoice){
     this.http.post<Invoice>(`${this.rootUrl}/api/Invoice`, invoice).subscribe(); 
   }
+
   updateInvoice(invoice: Invoice){
     this.http.put<Invoice>(`${this.rootUrl}/api/Invoice/UpdateInvoice`, invoice).subscribe();
   }
+  
   saveProduct(product : Product){
     this.http.post<Product>(`${this.rootUrl}/api/product`, product).subscribe();
   }
+
   updateProduct(product : Product){
     this.http.put<Product>(`${this.rootUrl}/api/product/UpdateProduct`, product).subscribe();
   }
+
   saveClient(client : Client){
     this.http.post<Client>(`${this.rootUrl}/api/client`, client).subscribe();
   }
+
   updateClient(client : Client){
     this.http.put<Client>(`${this.rootUrl}/api/client/UpdateClient`, client).subscribe();
   }
+
   saveSupplier(supplier : Supplier){
     this.http.post<Supplier>(`${this.rootUrl}/api/supplier`, supplier).subscribe();
   }
@@ -172,8 +80,8 @@ export class ApiHelperService<T> {
   saveSale(SaleDetail: SaleDetail[]) {
     return this.http.post<SaleDetail[]>(`${this.rootUrl}/api/Sale`, SaleDetail).subscribe();;
   }
+
   updateSale(SaleDetail: SaleDetail[], InvoiceID: number) {
-    const httpBody = { saleDetail: SaleDetail, InvoiceID: InvoiceID}
     this.http.put<SaleDetail[]>(`${this.rootUrl}/api/Sale/UpdateSale/${InvoiceID}`, SaleDetail ).subscribe();
   }
 
@@ -183,12 +91,11 @@ export class ApiHelperService<T> {
     });
   }
 
+  
+
   saveRecord(object: unknown) {
-    // let invoiceToUpdate = this.fakeInvoices.find(inv => inv.id === invoice.id)
-    // this.update(invoiceToUpdate, object);
     console.log("object SaveRecord", object);
     
-    // console.log("object.constructor.name", object.constructor.name);
     console.log("recsType", this.recsType);
     switch (this.recsType) {
       case "Product":
@@ -205,7 +112,6 @@ export class ApiHelperService<T> {
         break;
         case "Client":
         console.log("Client");
-        // this.saveClient(object as Client);
         this.saveClient(object as Client);
         break;
         case "Supplier":
@@ -276,10 +182,7 @@ export class ApiHelperService<T> {
         invoicetoupdate.amountDue = (object as Invoice).amountDue;
         invoicetoupdate.status = (object as Invoice).status;
         invoicetoupdate.saleDetails = (object as Invoice).saleDetails;
-        if(invoicetoupdate.sale === null){
-          invoicetoupdate.sale = new Sale((object as Invoice).sale);
-        }
-        invoicetoupdate.sale = (object as Invoice).sale;
+        invoicetoupdate.sale = new Sale((object as Invoice).sale);
         this.updateInvoice(invoicetoupdate);
         // this.updateSale(invoicetoupdate.saleDetails, invoicetoupdate.id);
         console.log("invoicetoupdate", invoicetoupdate);
@@ -298,10 +201,7 @@ export class ApiHelperService<T> {
 
   }
 
-  // getRecords(object: any): Observable<Product[] | Client[] | Supplier[] | Invoice[]> {
   getRecords(type: string, invoiceID: number = 0): Observable<Invoice[] | SaleDetail[]>  {
-    // let invoiceToUpdate = this.fakeInvoices.find(inv => inv.id === invoice.id)
-    // this.update(invoiceToUpdate, object);
     console.log(type);
 
     // console.log("object.constructor.name", object.constructor.name);
@@ -365,6 +265,7 @@ export class ApiHelperService<T> {
     };
     return this.http.delete(`${this.rootUrl}/api/product`, httpOptions).subscribe();
   }
+
   deleteClient(client : Client){
         const httpOptions = {
       headers: new HttpHeaders({
@@ -374,6 +275,7 @@ export class ApiHelperService<T> {
     };
     return this.http.delete(`${this.rootUrl}/api/Client/DeleteClient/`, httpOptions).subscribe();
   }
+
   deleteSupplier(supplier : Supplier){
         const httpOptions = {
       headers: new HttpHeaders({
@@ -422,40 +324,10 @@ export class ApiHelperService<T> {
     let params = new HttpParams({});
     params = params.append("InvoiceId", ID);
 
-    let res = this.http.get<SaleDetail[]>(`${this.rootUrl}/api/invoice/GetInvoiceSaleDetails`, { params });
-    console.log("getSaleDetailsByInvoiceID reslt",res);
-    
-    return res;
-    // return this.http.get(`${this.rootUrl}/api/invoice/GetInvoiceSaleDetails`, { params }).pipe(
-    //   map((saleDetails: SaleDetail[]) => {
-    //     // console.log("invoice get by id",invoice);
-    //     return saleDetails;
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-
-    //     console.log(error);
-
-    //     return throwError(error);
-    //   })
-    // );
+    return this.http.get<SaleDetail[]>(`${this.rootUrl}/api/invoice/GetInvoiceSaleDetails`, { params });
   }
 
   getSuppliers(): Observable<Supplier[]> {
-    // console.log("this.ParseJSONArray(this.fakeSuppliers)",this.ParseJSONArray(this.fakeSuppliers));
-    // return this.ParseJSONArray(this.fakeSuppliers);
-
-    // return this.http.get(`${this.rootUrl}/api/supplier`).pipe(
-    //   map((suppliers: Supplier[]) => {
-    //     return suppliers;
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-    //     console.log(error);
-    //     return throwError(error);
-    //   })
-    // );
-
     return this.http.get<Supplier[]>(`${this.rootUrl}/api/supplier`).pipe(
       map((suppliers: Supplier[]) => {
         return suppliers;
@@ -466,11 +338,7 @@ export class ApiHelperService<T> {
         return throwError(error);
       })
     );
-
-    
   }
-
-  
 
   deleteProducts(products: any) {
     //Modify so that the body of http options is array of product Ids
@@ -483,32 +351,7 @@ export class ApiHelperService<T> {
     return this.http.delete(`${this.rootUrl}/api/product`, httpOptions);
   }
 
-  login() {
-    // return this.http.post<any>(`${this.rootUrl}/token`, user)
-    // .pipe(
-    //   tap(tokens => this.loginUser(user.username, tokens)),
-    //   mapTo(true),
-    //   catchError(error => {
-    //     alert(error.error);
-    //     return of(false);
-    //   }));
-  }
-
-  
-
   getInvoiceById(ID: any) {
-    // const invoice: Invoice = new Invoice(this.fakeInvoices.find((invoice) => invoice.id === ID));
-    // // console.log("invoice.constructor.name",invoice.constructor.name);
-    // invoice.client = new Client (this.fakeClients.find(client => client.id === invoice.client.id));
-    // // const cl24 = new Client({ id: "24" });
-    // // invoice.client = new Client();
-    // // invoice.client = cl24;
-    // // console.log("invoice", invoice);
-    // // console.log("invoice.client", invoice.client);
-    // // console.log("Object.values(invoice)", Object.values(invoice));
-    // // console.log("cl24", cl24);
-    // return invoice;
-    
     let params = new HttpParams({});
     params = params.append("InvoiceId", ID);
 
@@ -528,22 +371,7 @@ export class ApiHelperService<T> {
   }
 
   getProductById(ID: any){
-    // const product: Product = new Product (this.fakeProducts.find((product) => product.id === ID));
-    // // console.log("product.constructor.name",product.constructor.name);
-    // return product;
-    // return this.http.get(`${this.rootUrl}/api/GetProductById/${ID}`).pipe(
-    //   map((product: Product) => {
-    //     return product;
-    //   }),
-    //   catchError((error) => {
-    //     console.log("error from api helper");
-
-    //     console.log(error);
-
-    //     return throwError(error);
-    //   })
-    // );
-    let params = new HttpParams();
+   let params = new HttpParams();
     params = params.append('ProductId', ID);
     return this.http.get<Product>(`${this.rootUrl}/api/product/getProductByID`, { params })
     .pipe(
@@ -555,17 +383,9 @@ export class ApiHelperService<T> {
         console.log(error);
         return throwError(error);
       }));
-      // console.log("result after http get", result);
-      // return result;
-    // return this.http.get<Product>(`${this.rootUrl}/api/product/getProductByID`, {params}).pipe(take(1)).toPromise();
-    // return this.objectbyId;
-  
   } 
 
   getclientById(ID: any) {
-    // const temp: Client = new Client (this.fakeClients.find((client) => client.id === ID));
-    // // console.log("client.constructor.name", temp.constructor.name);
-    // return temp;
     let params = new HttpParams();
     params = params.append('ClientId', ID);
     return this.http.get(`${this.rootUrl}/api/Client/getClientByID`,{params}).pipe(
@@ -599,15 +419,6 @@ export class ApiHelperService<T> {
     );
   }
 
-  // getSaleDetailById(ID){
-  //   const saleDetail: SaleDetail = new SaleDetail (this.fakeSaleDetails.find((saleDetail) => saleDetail.id === ID));
-  //   return saleDetail;
-  // }
-
-  //getToken(user:User){
-  //  return this.http.post<any>(`${this.rootUrl}/token`, user)
-  //}
-
   getByID<T>(ObjectTypeAsString, ID){
     console.log("object getByID", ObjectTypeAsString);
     console.log("ID", ID);
@@ -640,9 +451,6 @@ export class ApiHelperService<T> {
     return result;
   }
 
-
-  loginUser(username: string) {}
-
   objectIsEmpty(object) {
     let emptyProperties;
     if (object) {
@@ -663,43 +471,6 @@ export class ApiHelperService<T> {
     return false;
   }
 
-  update(targetObject, obj) {
-    if (!targetObject || !obj){
-      console.log("no target or object");
-      
-      return;
-    }
-    Object.keys(obj).forEach(key => {
-
-      // delete property if set to undefined or null
-      if (undefined === obj[key] || null === obj[key]) {
-        // delete targetObject[key]
-      }
-
-      // property value is object, so recurse
-      else if (
-        'object' === typeof obj[key]
-        && !Array.isArray(obj[key])
-      ) {
-
-        // target property not object, overwrite with empty object
-        if (
-          !('object' === typeof targetObject[key]
-            && !Array.isArray(targetObject[key]))
-        ) {
-          targetObject[key] = {}
-        }
-
-        // recurse
-        this.update(targetObject[key], obj[key])
-      }
-
-      // set target property to update property
-      else {
-        targetObject[key] = obj[key]
-      }
-    })
-  }
 
   ParseJSONArray(jObjectArray){
     

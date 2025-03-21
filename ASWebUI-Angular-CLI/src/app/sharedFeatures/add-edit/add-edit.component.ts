@@ -258,6 +258,8 @@ export class AddEditComponent<T> implements OnInit {
       // this.saleDetailsData = new MatTableDataSource<SaleDetail>(formSaleDetails);
       this.saleDetailsData = formSaleDetails;
 
+      this.table.refreshData(formSaleDetails);
+
       this.updateSale();
 
 
@@ -342,6 +344,7 @@ export class AddEditComponent<T> implements OnInit {
     // console.log('this.displayItem.constructor.name',this.displayItem.constructor.name);
 
     // this.apiHelper.deleteRecord(element, "SaleDetail")
+    this.table.refreshData(SDs);
   }
 
   formatDate(object) {

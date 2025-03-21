@@ -183,6 +183,10 @@ export class TableComponent<T extends Identification> implements OnInit, AfterVi
     
   }
 
+  refreshData(data:T[]){
+    this.tableDataSource = new MatTableDataSource<T>(data);
+  }
+
   private fillDataPaginator(data: T[]) {
 
     const startIndex = this.matPaginator.pageIndex * this.matPaginator.pageSize;

@@ -1,27 +1,90 @@
 
 <div class="container ">
-    
-    <form (ngSubmit)="onSubmit(f)" #f="ngForm" class="form " >
-        <h2>Register</h2>
-        <div class="form-group email">
-            <input [(ngModel)]="email" type="text" class="form-control" name="username" placeholder="Your Email *" autocomplete="username" required />
-        </div>
-        <div class="form-group">
-            <input  [(ngModel)]="password" type="password" class="form-control" name="password" placeholder="Your Password *" autocomplete="new-password" required />
-        </div>
-        <div class="form-group">
-            <input  [(ngModel)]="confirmPassword" type="password" class="form-control" name="confirmPassword" placeholder="Confirm Password *" autocomplete="new-password" required />
-        </div>
+    <div class="innerContainer">
 
-        <div class="form-group ">
-            <button [disabled]="f.invalid" type="submit" class="btn btn-outline-primary w-100" >Register</button>
-        </div>        
-    
-     
-    </form>
+        <h1>Register</h1>
+        <form (ngSubmit)="onSubmit()" [formGroup]="registrationForm" class="form ">
 
+
+            <div class="form-group firstName">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="firstName">
+                </mat-form-field>
+            </div>
+
+            <div class="form-group lastName">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lastName">
+                </mat-form-field>
+            </div>
+
+            <div class="form-group userName">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="userName">
+                </mat-form-field>
+            </div>
+
+            <div class="form-group emailAddress">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="emailAddress" required>
+                    <mat-error *ngIf="emailAddress.hasError('required')">
+                        Email is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="emailAddress.hasError('email')">
+                        Enter <strong>valid</strong> email
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-group password">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" type="password" required (input)="checkPasswords()">
+                    <mat-error *ngIf="password.hasError('required')">
+                        Password is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-group confirmPassword">
+                <mat-form-field class="formfield" appearance="outline">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput formControlName="confirmPassword" type="password" required (input)="checkPasswords()">
+                    <mat-error *ngIf="confirmPassword.hasError('required')">
+                        Please <strong>confirm</strong> your password
+                    </mat-error>
+                    <mat-error *ngIf="confirmPassword.hasError('passwordMismatch')">
+                        Passwords dont <strong>match</strong>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-group permissions">
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>Permissions</mat-label>
+                    <mat-select formControlName="userRoles" [compareWith]="compareFn" multiple required>
+                    <mat-option *ngFor="let role of rolesOptions" [value]="role">{{role.roleName}}</mat-option>
+                    </mat-select>
+                    <mat-error>
+                        Select a <strong>permission</strong> to continue
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-group  registerbtn">
+                <button [disabled]="registrationForm.invalid" type="submit" mat-stroked-button color="primary">Register</button>
+            </div>        
+        
+        
+        </form>
+
+    </div>
     <div class="form-group mt-4">
-        <p class="Register">Already have an account? <a [routerLink]="[ '/login' ]" routerLinkActive="active">Login</a></p>
+        <p class="login">Already have an account? <a [routerLink]="[ '/login' ]" routerLinkActive="active">Login</a></p>
     </div>   
     
 </div>
